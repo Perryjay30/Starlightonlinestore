@@ -18,7 +18,7 @@ public class ProductController {
     private ProductService productService;
     @PostMapping
     public ResponseEntity<?> addProduct(@RequestBody AddProductRequest addProductRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(productService.addProduct(addProductRequest));
+        return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(addProductRequest));
     }
 
     @PatchMapping

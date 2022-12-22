@@ -9,7 +9,7 @@ import com.starlightonlinestore.Data.dto.Response.Response;
 public interface ProductService {
 //    Should there be a product model?
 //    Shouldn't an admin/vendor be doing this?
-    AddProductResponse addProduct(AddProductRequest addProductRequest);
+    AddProductResponse createProduct(AddProductRequest addProductRequest);
     Product getProductById(int id);
     Response updateProduct
             (ProductUpdateRequest productUpdateRequest);

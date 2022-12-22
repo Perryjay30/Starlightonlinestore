@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -21,4 +23,6 @@ public class Vendor extends AppUser {
     private String storeName;
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> storeAddress = new HashSet<>();
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<Product> productList = new ArrayList<>();
 }

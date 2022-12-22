@@ -1,8 +1,12 @@
 package com.starlightonlinestore.Service;
 
 import com.starlightonlinestore.Data.Exceptions.CustomerRegistrationException;
+import com.starlightonlinestore.Data.Models.Product;
+import com.starlightonlinestore.Data.Models.ProductCategory;
 import com.starlightonlinestore.Data.Models.Vendor;
+import com.starlightonlinestore.Data.Repository.ProductRepository;
 import com.starlightonlinestore.Data.Repository.VendorRepository;
+import com.starlightonlinestore.Data.dto.Request.AddProductRequest;
 import com.starlightonlinestore.Data.dto.Request.CreateVendorRequest;
 import com.starlightonlinestore.Data.dto.Request.LoginRequest;
 import com.starlightonlinestore.Data.dto.Request.UpdateRequest;
@@ -20,6 +24,12 @@ import java.util.Set;
 public class VendorServiceImpl implements VendorService {
     @Autowired
     private VendorRepository vendorRepository;
+
+    @Autowired
+    private ProductService productService;
+
+//    @Autowired
+//    private ProductRepository productRepository;
 
     @Override
     public CreateVendorResponse createVendor(CreateVendorRequest createVendorRequest) {
@@ -107,5 +117,22 @@ public class VendorServiceImpl implements VendorService {
     public Response deleteVendor(int id) {
         vendorRepository.deleteById(id);
         return new Response("Deleted");
+    }
+
+    @Override
+    public Response addProduct(int id, AddProductRequest addProductRequest) {
+        Vendor savedVendor = vendorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Vendor not found"));
+        Product product = new Product();
+        product.setName(addProductRequest.getName());
+        product.setQuantity(addProductRequest.getProductQuantity());
+        product.setPrice(addProductRequest.getPrice());
+        product.setCategory(ProductCategory.valueOf(String.valueOf(addProductRequest
+                .getCategory())));
+        savedVendor.getProductList().add(product);
+//        productRepository.save(product);
+        productService.createProduct(addProductRequest);
+
+        return new Response("Product has been added successfully");
     }
 }

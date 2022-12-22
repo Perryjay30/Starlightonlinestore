@@ -1,5 +1,8 @@
 package com.starlightonlinestore.Service;
 
+import com.starlightonlinestore.Data.Models.Product;
+import com.starlightonlinestore.Data.Models.ProductCategory;
+import com.starlightonlinestore.Data.dto.Request.AddProductRequest;
 import com.starlightonlinestore.Data.dto.Request.CreateVendorRequest;
 import com.starlightonlinestore.Data.dto.Request.LoginRequest;
 import com.starlightonlinestore.Data.dto.Request.UpdateRequest;
@@ -10,6 +13,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -67,5 +72,18 @@ class VendorServiceImplTest {
         Response delResponse = vendorService.deleteVendor(102);
         System.out.println(delResponse);
         assertEquals("Deleted", delResponse.getMessage());
+    }
+
+    @Test
+    void testThatVendorCanAddProduct() {
+        AddProductRequest productRequest = new AddProductRequest();
+        productRequest.setName("LG 55inch LED Television");
+        productRequest.setPrice(BigDecimal.valueOf(149000));
+        productRequest.setProductQuantity(5);
+        productRequest.setCategory(String.valueOf(ProductCategory.COMPUTING));
+        Response response = vendorService.addProduct(1, productRequest);
+        assertEquals("Product has been added successfully", response.getMessage());
+
+
     }
 }

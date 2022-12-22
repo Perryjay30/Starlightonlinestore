@@ -32,14 +32,14 @@ public class ProductServiceImplTest {
         addProductRequest = new AddProductRequest();
 
         addProductRequest.setName("Versace, Turtle-neck");
-        addProductRequest.setPrice(15000.00);
+        addProductRequest.setPrice(BigDecimal.valueOf(15000.00));
         addProductRequest.setCategory
                 (String.valueOf(ProductCategory.FASHION));
         addProductRequest.setProductQuantity(32);
 
         addSecondProductRequest = new AddProductRequest();
         addSecondProductRequest.setName("Bag Of Rice");
-        addSecondProductRequest.setPrice(45000.00);
+        addSecondProductRequest.setPrice(BigDecimal.valueOf(45000.00));
         addSecondProductRequest.setCategory
                 (String.valueOf(GROCERIES));
         addSecondProductRequest.setProductQuantity(21);
@@ -48,9 +48,9 @@ public class ProductServiceImplTest {
     @Test
     void addProductTest() {
         AddProductResponse response =
-                productService.addProduct(addProductRequest);
+                productService.createProduct(addProductRequest);
         AddProductResponse response2 =
-                productService.addProduct(addSecondProductRequest);
+                productService.createProduct(addSecondProductRequest);
         assertNotNull(response);
         System.out.println(response2);
         assertEquals("product added successfully", response.getMessage());
@@ -72,7 +72,7 @@ public class ProductServiceImplTest {
 
     @Test
     void testThatProductCanBeDeleted() {
-        Response deleteResponse = productService.deleteProduct(353);
+        Response deleteResponse = productService.deleteProduct(52);
         System.out.println(deleteResponse);
         assertEquals("Product has been deleted", deleteResponse.getMessage());
     }

@@ -19,15 +19,17 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepository;
 
+
     @Override
-    public AddProductResponse addProduct(AddProductRequest addProductRequest) {
+    public AddProductResponse createProduct(AddProductRequest addProductRequest) {
         Product product = new Product();
-        product.setPrice(BigDecimal.valueOf(addProductRequest.getPrice()));
+        product.setPrice(addProductRequest.getPrice());
         product.setCategory(ProductCategory.valueOf(String.valueOf(addProductRequest
                 .getCategory())));
         product.setName(addProductRequest.getName());
         product.setQuantity(addProductRequest.getProductQuantity());
         Product savedProduct = productRepository.save(product);
+//        vendorService.addProduct(addProductRequest.getId(), savedProduct);
 
         AddProductResponse response = new AddProductResponse();
         response.setProductId(savedProduct.getId());
