@@ -34,14 +34,14 @@ public class ProductServiceImplTest {
         addProductRequest.setName("Versace, Turtle-neck");
         addProductRequest.setPrice(BigDecimal.valueOf(15000.00));
         addProductRequest.setCategory
-                (String.valueOf(ProductCategory.FASHION));
+                (ProductCategory.FASHION);
         addProductRequest.setProductQuantity(32);
 
         addSecondProductRequest = new AddProductRequest();
         addSecondProductRequest.setName("Bag Of Rice");
         addSecondProductRequest.setPrice(BigDecimal.valueOf(45000.00));
         addSecondProductRequest.setCategory
-                (String.valueOf(GROCERIES));
+                (GROCERIES);
         addSecondProductRequest.setProductQuantity(21);
     }
 

@@ -80,10 +80,8 @@ class VendorServiceImplTest {
         productRequest.setName("LG 55inch LED Television");
         productRequest.setPrice(BigDecimal.valueOf(149000));
         productRequest.setProductQuantity(5);
-        productRequest.setCategory(String.valueOf(ProductCategory.COMPUTING));
+        productRequest.setCategory(ProductCategory.COMPUTING);
         Response response = vendorService.addProduct(1, productRequest);
         assertEquals("Product has been added successfully", response.getMessage());
-
-
     }
 }

@@ -29,7 +29,6 @@ public class ProductServiceImpl implements ProductService {
         product.setName(addProductRequest.getName());
         product.setQuantity(addProductRequest.getProductQuantity());
         Product savedProduct = productRepository.save(product);
-//        vendorService.addProduct(addProductRequest.getId(), savedProduct);
 
         AddProductResponse response = new AddProductResponse();
         response.setProductId(savedProduct.getId());

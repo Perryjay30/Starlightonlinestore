@@ -1,10 +1,8 @@
 package com.starlightonlinestore;
 
+import com.starlightonlinestore.Data.Models.ProductCategory;
 import com.starlightonlinestore.Data.dto.Request.*;
-import com.starlightonlinestore.Data.dto.Response.CustomerRegistrationResponse;
-import com.starlightonlinestore.Data.dto.Response.LoginResponse;
-import com.starlightonlinestore.Data.dto.Response.ProductPurchaseResponse;
-import com.starlightonlinestore.Data.dto.Response.Response;
+import com.starlightonlinestore.Data.dto.Response.*;
 import com.starlightonlinestore.Service.CustomerService;
 import com.starlightonlinestore.Service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,13 +16,9 @@ import static org.junit.jupiter.api.Assertions.*;
 public class CustomerServiceImplTest {
     @Autowired
     private CustomerService customerService;
-    @Autowired
-    private ProductService productService;
     private CustomerRegistrationRequest firstBuyerRegisterRequest;
     private CustomerRegistrationRequest secondBuyerRegisterRequest;
-    private ProductPurchaseRequest productPurchaseRequest;
-    private AddProductRequest addProductRequest;
-
+    private OrderProductRequest orderProductRequest;
     @BeforeEach
     void setUp() {
         firstBuyerRegisterRequest = new CustomerRegistrationRequest();
@@ -74,6 +68,7 @@ public class CustomerServiceImplTest {
         assertEquals("successful login", loginResponse.getMessage());
     }
 
+
     @Test
     void testThatCustomerCanBeUpdated() {
         UpdateRequest updateCustomer = new UpdateRequest();
@@ -98,14 +93,15 @@ public class CustomerServiceImplTest {
 
     @Test
     void testThatCustomerCanOrderProduct() {
-        productPurchaseRequest = new ProductPurchaseRequest();
-        productPurchaseRequest.setProductId(402);
-        productPurchaseRequest.setQuantity(4);
-        productPurchaseRequest.setCustomerId(152);
-        productPurchaseRequest.setName("Versace, Turtle-neck");
-        ProductPurchaseResponse purchaseResponse = customerService.orderProduct(productPurchaseRequest);
-        System.out.println(purchaseResponse);
-        assertEquals(201, purchaseResponse.getStatusCode());
+        orderProductRequest = new OrderProductRequest();
+        orderProductRequest.setCustomerId(1);
+        orderProductRequest.setQuantity(4);
+        orderProductRequest.setProductName("Versace, Turtle-neck");
+        orderProductRequest.setProductCategory(ProductCategory.GROCERIES);
+        orderProductRequest.setPrice(17000.00);
+        OrderProductResponse orderProductResponse = customerService.orderProduct(orderProductRequest);
+        System.out.println(orderProductResponse);
+        assertEquals(201, orderProductResponse.getStatusCode());
     }
 
 

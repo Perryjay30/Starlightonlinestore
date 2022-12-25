@@ -1,6 +1,8 @@
 package com.starlightonlinestore.Controller;
 
 import com.starlightonlinestore.Data.dto.Request.CustomerRegistrationRequest;
+import com.starlightonlinestore.Data.dto.Request.LoginRequest;
+import com.starlightonlinestore.Data.dto.Request.OrderProductRequest;
 import com.starlightonlinestore.Data.dto.Request.UpdateRequest;
 import com.starlightonlinestore.Service.CustomerService;
 import lombok.extern.slf4j.Slf4j;
@@ -23,19 +25,30 @@ public class CustomerController {
         return ResponseEntity.status(HttpStatus.CREATED).body(customerService.register(customerRegistrationRequest));
     }
 
-    @GetMapping
-    public ResponseEntity<?> getAllCustomers() {
-        return ResponseEntity.ok(customerService.getAllCustomers());
-    }
 
-    @DeleteMapping
-    public ResponseEntity<?> deleteCustomerById(int id) {
+    @GetMapping
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        return ResponseEntity.ok(customerService.login(loginRequest));
+    }
+//    @GetMapping
+//    public ResponseEntity<?> getAllCustomers() {
+//        return ResponseEntity.ok(customerService.getAllCustomers());
+//    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteCustomerById(@PathVariable int id) {
+        log.info("Id -> {}", id);
       return ResponseEntity.ok(customerService.deleteCustomer(id));
     }
 
     @PatchMapping
     public ResponseEntity<?> updateCustomer(@RequestBody UpdateRequest updateRequest) {
        return ResponseEntity.ok(customerService.updateCustomer(updateRequest));
+    }
+
+    @PostMapping("/order")
+    public ResponseEntity<?> orderProduct(@RequestBody OrderProductRequest orderProductRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(customerService.orderProduct(orderProductRequest));
     }
 
 }

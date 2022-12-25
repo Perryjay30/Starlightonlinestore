@@ -1,19 +1,12 @@
 package com.starlightonlinestore.Service;
 
 import com.starlightonlinestore.Data.Exceptions.CustomerRegistrationException;
-import com.starlightonlinestore.Data.Exceptions.StoreException;
 import com.starlightonlinestore.Data.Models.Customer;
-import com.starlightonlinestore.Data.Models.Product;
+import com.starlightonlinestore.Data.Models.CustomerOrder;
 import com.starlightonlinestore.Data.Repository.CustomerRepository;
-import com.starlightonlinestore.Data.Repository.ProductRepository;
-import com.starlightonlinestore.Data.dto.Request.CustomerRegistrationRequest;
-import com.starlightonlinestore.Data.dto.Request.LoginRequest;
-import com.starlightonlinestore.Data.dto.Request.ProductPurchaseRequest;
-import com.starlightonlinestore.Data.dto.Request.UpdateRequest;
-import com.starlightonlinestore.Data.dto.Response.CustomerRegistrationResponse;
-import com.starlightonlinestore.Data.dto.Response.LoginResponse;
-import com.starlightonlinestore.Data.dto.Response.ProductPurchaseResponse;
-import com.starlightonlinestore.Data.dto.Response.Response;
+import com.starlightonlinestore.Data.Repository.OrderRepository;
+import com.starlightonlinestore.Data.dto.Request.*;
+import com.starlightonlinestore.Data.dto.Response.*;
 import com.starlightonlinestore.utils.validators.UserDetailsValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,10 +22,8 @@ public class CustomerServiceImpl implements CustomerService {
     private CustomerRepository customerRepository;
 
     @Autowired
-    private ProductRepository productRepository;
+    private OrderRepository orderRepository;
 
-    @Autowired
-    private ProductService productService;
     @Override
     public CustomerRegistrationResponse register(CustomerRegistrationRequest registrationRequest) {
         if(!UserDetailsValidator.isValidEmailAddress(registrationRequest.getEmail()))
@@ -88,32 +79,42 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public ProductPurchaseResponse orderProduct(ProductPurchaseRequest productPurchaseRequest)  {
+    public OrderProductResponse orderProduct(OrderProductRequest orderProductRequest) {
         Customer customer =
-                customerRepository.findById(productPurchaseRequest.
+                customerRepository.findById(orderProductRequest.
                         getCustomerId()).orElseThrow(() -> new RuntimeException("Kindly enter a valid customer Id"));
-        Product product =
-                productService.getProductById(productPurchaseRequest.getProductId());
-        if(product == null) throw new StoreException("Sorry, product is not available");
-        product.setName(productPurchaseRequest.getName());
+        CustomerOrder order = placingOrder(orderProductRequest);
+        customer.getCustomerOrderList().add(order);
+        CustomerOrder orderedProduct = orderRepository.save(order);
+        return placedOrderResponse(orderedProduct);
+    }
+//        if(product.getQuantity() >= orderProductRequest.getQuantity()) {
 
-        if(product.getQuantity() >= productPurchaseRequest.getQuantity()) {
-            customer.getOrders().add(product);
-            product.setQuantity((product.getQuantity() - productPurchaseRequest.getQuantity()));
-        }
-            Product orderedProduct = productRepository.save(product);
-            customerRepository.save(customer);
 
-        ProductPurchaseResponse productPurchaseResponse = new ProductPurchaseResponse();
-        productPurchaseResponse.setId(orderedProduct.getId());
-        productPurchaseResponse.setStatusCode(201);
-        productPurchaseResponse.setMessage("You just made a successful order");
-        return productPurchaseResponse;
-
-//            return "order successful";
-//        } else {
-//            throw new StoreException("order quantity larger than available quantity");
 //        }
+//        else
+//            throw new RuntimeException("order quantity larger than available quantity");
+
+
+
+//            customerRepository.save(customer);
+
+    private OrderProductResponse placedOrderResponse(CustomerOrder orderedProduct) {
+        OrderProductResponse orderProductResponse = new OrderProductResponse();
+        orderProductResponse.setId(orderedProduct.getId());
+        orderProductResponse.setStatusCode(201);
+        orderProductResponse.setMessage("You just made a successful order");
+        return orderProductResponse;
+    }
+
+    private CustomerOrder placingOrder(OrderProductRequest orderProductRequest) {
+        CustomerOrder order = new CustomerOrder();
+        order.setProductName(orderProductRequest.getProductName());
+        order.setProductCategory(orderProductRequest.getProductCategory());
+        order.setPrice(orderProductRequest.getPrice());
+        order.setQuantity(orderProductRequest.getQuantity());
+        order.setTotal(order.getPrice() * order.getQuantity());
+        return order;
     }
 
     @Override

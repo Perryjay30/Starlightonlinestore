@@ -24,5 +24,5 @@ public class Customer extends AppUser  {
     @ElementCollection
     private Set<String> deliveryAddress = new HashSet<>();
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<Product> orders = new ArrayList<>();
+    private List<CustomerOrder> customerOrderList = new ArrayList<>();
 }

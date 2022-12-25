@@ -32,8 +32,8 @@ public class VendorController {
         return ResponseEntity.ok(vendorService.updateVendor(updateRequest));
     }
 
-    @DeleteMapping
-    public ResponseEntity<?> deleteVendor(int id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteVendor(@PathVariable int id) {
         return ResponseEntity.ok(vendorService.deleteVendor(id));
     }
 
