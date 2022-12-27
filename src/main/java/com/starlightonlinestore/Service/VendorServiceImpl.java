@@ -60,10 +60,16 @@ public class VendorServiceImpl implements VendorService {
 
     private Vendor registeringVendor(CreateVendorRequest createVendorRequest) {
         Vendor vendor = new Vendor();
-        vendor.setEmail(createVendorRequest.getEmailAddress());
+        if(vendorRepository.findByEmail(createVendorRequest.getEmailAddress()).isPresent())
+            throw new RuntimeException("This email has been taken, kindly register with another email address");
+        else
+            vendor.setEmail(createVendorRequest.getEmailAddress());
         vendor.setPassword(createVendorRequest.getPassword());
         vendor.setStoreName(createVendorRequest.getStoreName());
-        vendor.setPhoneNumber(createVendorRequest.getPhoneNumber());
+        if(vendorRepository.findByPhoneNumber(createVendorRequest.getPhoneNumber()).isPresent())
+            throw new RuntimeException("This Phone Number has been taken, kindly register with another");
+        else
+            vendor.setPhoneNumber(createVendorRequest.getPhoneNumber());
         Set<String> vendorStoreAddress = vendor.getStoreAddress();
         vendorStoreAddress.add(createVendorRequest.getStoreAddress());
         return vendor;

@@ -86,7 +86,7 @@ public class CustomerServiceImplTest {
 
     @Test
     void testThatCustomerCanBeDeleted() {
-        Response deleteResponse = customerService.deleteCustomer(102);
+        Response deleteResponse = customerService.deleteCustomer(1);
         System.out.println(deleteResponse);
         assertEquals("Customer deleted", deleteResponse.getMessage());
     }

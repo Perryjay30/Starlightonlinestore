@@ -56,11 +56,17 @@ public class CustomerServiceImpl implements CustomerService {
 
     private Customer buildBuyer(CustomerRegistrationRequest registrationRequest) {
         Customer customer = new Customer();
-        customer.setEmail(registrationRequest.getEmail());
+        if(customerRepository.findByEmail(registrationRequest.getEmail()).isPresent())
+            throw new RuntimeException("This email has been taken, kindly register with another email address");
+        else
+            customer.setEmail(registrationRequest.getEmail());
         customer.setPassword(registrationRequest.getPassword());
         Set<String> buyersAddressList = customer.getDeliveryAddress();
         buyersAddressList.add(registrationRequest.getAddress());
-        customer.setPhoneNumber(registrationRequest.getPhoneNumber());
+        if(customerRepository.findByPhoneNumber(registrationRequest.getPhoneNumber()).isPresent())
+            throw new RuntimeException("This Phone Number has been taken, kindly register with another");
+        else
+            customer.setPhoneNumber(registrationRequest.getPhoneNumber());
         return customer;
     }
 
@@ -68,7 +74,7 @@ public class CustomerServiceImpl implements CustomerService {
     public LoginResponse login(LoginRequest loginRequest) {
         Customer foundCustomer = customerRepository.findByEmail(loginRequest
                 .getEmail()).orElseThrow(() -> new RuntimeException("your email is incorrect"));
-
+//      foundCustomer.setEmail(loginRequest.getEmail())
         LoginResponse loginResponse = new LoginResponse();
         if(foundCustomer.getPassword().equals(loginRequest.getPassword())) {
             loginResponse.setMessage("successful login");
