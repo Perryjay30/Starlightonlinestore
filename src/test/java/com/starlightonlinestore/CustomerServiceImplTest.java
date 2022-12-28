@@ -4,7 +4,6 @@ import com.starlightonlinestore.Data.Models.ProductCategory;
 import com.starlightonlinestore.Data.dto.Request.*;
 import com.starlightonlinestore.Data.dto.Response.*;
 import com.starlightonlinestore.Service.CustomerService;
-import com.starlightonlinestore.Service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
