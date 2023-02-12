@@ -1,18 +1,27 @@
 package com.starlightonlinestore.service;
 
-import com.starlightonlinestore.data.dto.Request.AddProductRequest;
-import com.starlightonlinestore.data.dto.Request.CreateVendorRequest;
-import com.starlightonlinestore.data.dto.Request.LoginRequest;
-import com.starlightonlinestore.data.dto.Request.UpdateRequest;
+import com.starlightonlinestore.data.dto.Request.*;
 import com.starlightonlinestore.data.dto.Response.CreateVendorResponse;
 import com.starlightonlinestore.data.dto.Response.LoginResponse;
 import com.starlightonlinestore.data.dto.Response.Response;
+import jakarta.mail.MessagingException;
 
 public interface VendorService {
-CreateVendorResponse createVendor(CreateVendorRequest createVendorRequest);
+String register(CreateVendorRequest createVendorRequest);
+CreateVendorResponse createAccount(VerifyOtpRequest verifyOtpRequest);
+
+void verifyOTP(VerifyOtpRequest verifyOtpRequest);
+
+String forgotPassword(ForgotPasswordRequest forgotPasswordRequest) throws MessagingException;
+
+Response resetPassword(ResetPasswordRequest resetPasswordRequest);
+
+String sendOTP(SendOtpRequest sendOtpRequest);
 LoginResponse login(LoginRequest loginRequest);
-Response updateVendor(UpdateRequest updateRequest);
-Response deleteVendor(int id);
+Response updateVendor(Integer id, UpdateRequest updateRequest);
+
+Response deleteVendor(Integer id, DeleteRequest deleteRequest);
+Response changePassword(ChangePasswordRequest changePasswordRequest);
 
 Response addProduct(int id, AddProductRequest addProductRequest);
 

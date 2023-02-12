@@ -1,18 +1,59 @@
-management:
-  endpoints:
-    web:
-      exposure:
-      include: '*'
-  info:
-    env:
-      enabled: true
-
-info:
-  application:
-    name: StarlightStores
-    description: online stor eapi
-    author: PerryJay
-    version: '@project.version@'
+server:
+  port: 8082
 spring:
-  profiles:
-    active: prod
+  datasource:
+    url: jdbc:mysql://localhost:3306/StarlightOnlineStore_db?createDatabaseIfNotExist=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: Oluwapelumi
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+
+  mail:
+    host: localhost
+    port: 1025
+    username: hello
+    password: hello
+    properties:
+      mail:
+        smtp:
+          ssl:
+            trust: "*"
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
+
+
+
+
+
+
+
+
+
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#      include: '*'
+#  info:
+#    env:
+#      enabled: true
+#
+#info:
+#  application:
+#    name: StarlightStores
+#    description: online stor eapi
+#    author: PerryJay
+#    version: '@project.version@'
+#spring:
+#  profiles:
+#    active: prod

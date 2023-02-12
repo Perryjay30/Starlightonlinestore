@@ -9,18 +9,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@NoArgsConstructor
+@RequiredArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
-@Builder
 @Entity
-public class Vendor extends AppUser {
+public class Vendor {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+    private String email;
+    private String password;
+    private String phoneNumber;
+    @Enumerated(EnumType.STRING)
+    private Role role;
     private String storeName;
+    @Enumerated(EnumType.STRING)
+    private Status status;
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> storeAddress = new HashSet<>();
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

@@ -6,22 +6,26 @@ import lombok.*;
 import java.util.*;
 
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
+@Data
 @Entity
-@ToString
 @Builder
-public class Customer extends AppUser  {
+@AllArgsConstructor
+@RequiredArgsConstructor
+public class Customer  {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     private String firstName;
     private String LastName;
-    private boolean isActive;
+    @Enumerated(EnumType.STRING)
+    private Status status;
+    private String email;
+    private String password;
+    private String phoneNumber;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> deliveryAddress = new HashSet<>();
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<CustomerOrder> customerOrderList = new ArrayList<>();

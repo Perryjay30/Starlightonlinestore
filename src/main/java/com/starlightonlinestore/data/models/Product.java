@@ -13,7 +13,6 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private String name;
-    @Enumerated
     private ProductCategory category;
     private int vendorId;
     private BigDecimal price;

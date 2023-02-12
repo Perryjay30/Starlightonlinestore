@@ -32,11 +32,8 @@ public class ProductServiceImpl implements ProductService {
         response.setProductId(savedProduct.getId());
         response.setMessage("product added successfully");
         response.setStatusCode(201);
-
         return response;
     }
-
-
 
     @Override
     public Product getProductById(int id) {
@@ -45,23 +42,22 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Response updateProduct(ProductUpdateRequest productUpdateRequest) {
-        var foundProduct = productRepository.findById(productUpdateRequest.getId());
+    public Response updateProduct(Integer id, ProductUpdateRequest productUpdateRequest) {
+        var foundProduct = productRepository.findById(id);
         if(foundProduct.isEmpty()) throw new RuntimeException("Product cannot be found");
-        Product replaceProduct = updatingProduct(productUpdateRequest);
+        Product replaceProduct = updatingProduct(id, productUpdateRequest);
         productRepository.save(replaceProduct);
         return new Response("Product update successful");
     }
 
-    private Product updatingProduct(ProductUpdateRequest productUpdateRequest) {
+    private Product updatingProduct(Integer id, ProductUpdateRequest productUpdateRequest) {
         Product replaceProduct = new Product();
-        replaceProduct.setId(productUpdateRequest.getId());
+        replaceProduct.setId(id);
 //        if statement
 //        String.valueOf(ProductCategory.valueOf(productUpdateRequest.getCategory()));
 //        String.valueOf(ProductCategory.valueOf(productUpdateRequest.getCategory()));
 ////        else
-        replaceProduct.setCategory(
-        (ProductCategory.valueOf(String.valueOf(productUpdateRequest.getCategory()))));
+        replaceProduct.setCategory(productUpdateRequest.getCategory());
         updatingProduct2(productUpdateRequest, replaceProduct);
         return replaceProduct;
     }

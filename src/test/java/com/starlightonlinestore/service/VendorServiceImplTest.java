@@ -1,13 +1,12 @@
 package com.starlightonlinestore.service;
 
+import com.starlightonlinestore.data.dto.Request.*;
+import com.starlightonlinestore.data.dto.Response.CustomerRegistrationResponse;
 import com.starlightonlinestore.data.models.ProductCategory;
-import com.starlightonlinestore.data.dto.Request.AddProductRequest;
-import com.starlightonlinestore.data.dto.Request.CreateVendorRequest;
-import com.starlightonlinestore.data.dto.Request.LoginRequest;
-import com.starlightonlinestore.data.dto.Request.UpdateRequest;
 import com.starlightonlinestore.data.dto.Response.CreateVendorResponse;
 import com.starlightonlinestore.data.dto.Response.LoginResponse;
 import com.starlightonlinestore.data.dto.Response.Response;
+import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,63 +22,94 @@ class VendorServiceImplTest {
     @Autowired
     private VendorService vendorService;
 
-    private CreateVendorRequest createVendorRequest;
-
-    @BeforeEach
-    void setUp() {
-        createVendorRequest = new CreateVendorRequest();
-        createVendorRequest.setStoreName("Ikeja City Mall");
-        createVendorRequest.setPhoneNumber("08123459204");
+    @Test
+    void testThatVendorCanRegister() {
+        CreateVendorRequest createVendorRequest = new CreateVendorRequest();
+        createVendorRequest.setStoreName("Perry Technologies");
         createVendorRequest.setEmailAddress("helloworld@gmail.com");
         createVendorRequest.setPassword("Iamnotalone#12");
-        createVendorRequest.setStoreAddress("No 45, Abiola way, Lagos");
+        String answer = vendorService.register(createVendorRequest);
+        assertEquals("Token successfully sent to your email. Please check.", answer);
     }
 
     @Test
-    void createVendor() {
+    void testThatVendorAccountHasBeenCreated() {
+        VerifyOtpRequest verifyOtpRequest = new VerifyOtpRequest();
+        verifyOtpRequest.setToken("9537");
+        verifyOtpRequest.setEmail("helloworld@gmail.com");
         CreateVendorResponse vendorResponse =
-                vendorService.createVendor(createVendorRequest);
-        System.out.println(vendorResponse);
+                vendorService.createAccount(verifyOtpRequest);
         assertEquals("Successfully registered", vendorResponse.getMessage());
     }
 
+
     @Test
-    void login() {
-        LoginRequest login = new LoginRequest();
-        login.setEmail(createVendorRequest.getEmailAddress());
-        login.setPassword(createVendorRequest.getPassword());
-        LoginResponse response = vendorService.login(login);
-        System.out.println(response);
-        assertEquals("login is successful", response.getMessage());
+    void testThatVendorCanLogin() {
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmail("helloworld@gmail.com");
+        loginRequest.setPassword("Iamnotalone#12");
+        LoginResponse loginResponse = vendorService.login(loginRequest);
+        assertEquals("login is successful", loginResponse.getMessage());
     }
+
+    @Test
+    void testThatVendorCanChangePassword() {
+        ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest();
+        changePasswordRequest.setEmail("helloworld@gmail.com");
+        changePasswordRequest.setOldPassword("Iamnotalone#12");
+        changePasswordRequest.setNewPassword("ChangePass!28");
+        Response resp = vendorService.changePassword(changePasswordRequest);
+        assertEquals("Your password has been successfully changed", resp.getMessage());
+    }
+
+    @Test
+    void testThatForgotPasswordMethodWorks() throws MessagingException {
+        ForgotPasswordRequest forgotPasswordRequest = new ForgotPasswordRequest();
+        forgotPasswordRequest.setEmail("helloworld@gmail.com");
+        var response = vendorService.forgotPassword(forgotPasswordRequest);
+        assertEquals("Token successfully sent to your email. Please check.", response);
+    }
+
+    @Test
+    void testThatPasswordCanBeResetAfterForgotten() {
+        ResetPasswordRequest resetPasswordRequest = new ResetPasswordRequest();
+        resetPasswordRequest.setToken("3122");
+        resetPasswordRequest.setEmail("helloworld@gmail.com");
+        resetPasswordRequest.setPassword("Nightingale@90");
+        resetPasswordRequest.setConfirmPassword("Nightingale@90");
+        Response answer = vendorService.resetPassword(resetPasswordRequest);
+        assertEquals("Your password has been reset successfully", answer.getMessage());
+    }
+
 
     @Test
     void updateVendor() {
         UpdateRequest requestUpdate = new UpdateRequest();
-        requestUpdate.setId(2);
         requestUpdate.setPhone("09161931557");
-        requestUpdate.setPassword("Youwillnever!17");
         requestUpdate.setEmail("daredevil@yahoo.com");
-
-        Response updateResponse = vendorService.updateVendor(requestUpdate);
+        requestUpdate.setStoreAddress("312 Portland region, Oregon");
+        requestUpdate.setStoreName("Heartland Software");
+        Response updateResponse = vendorService.updateVendor(1, requestUpdate);
         System.out.println(updateResponse);
         assertEquals("Vendor has been updated", updateResponse.getMessage());
     }
 
     @Test
     void deleteVendor() {
-        Response delResponse = vendorService.deleteVendor(102);
+        DeleteRequest deleteRequest = new DeleteRequest();
+        deleteRequest.setPassword("Nightingale@90");
+        Response delResponse = vendorService.deleteVendor(1, deleteRequest);
         System.out.println(delResponse);
-        assertEquals("Deleted", delResponse.getMessage());
+        assertEquals("Vendor deleted", delResponse.getMessage());
     }
-
+//
     @Test
     void testThatVendorCanAddProduct() {
         AddProductRequest productRequest = new AddProductRequest();
         productRequest.setName("LG 55inch LED Television");
         productRequest.setPrice(BigDecimal.valueOf(149000));
         productRequest.setProductQuantity(5);
-        productRequest.setCategory(ProductCategory.COMPUTING);
+        productRequest.setCategory(ProductCategory.GROCERIES);
         Response response = vendorService.addProduct(1, productRequest);
         assertEquals("Product has been added successfully", response.getMessage());
     }

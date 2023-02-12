@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 
-
 import static com.starlightonlinestore.data.models.ProductCategory.GROCERIES;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -59,12 +58,11 @@ public class ProductServiceImplTest {
     @Test
     void testThatProductCanBeUpdated() {
         ProductUpdateRequest productUpdateRequest = new ProductUpdateRequest();
-        productUpdateRequest.setId(352);
-        productUpdateRequest.setCategory(String.valueOf(ProductCategory.APPLIANCES));
+        productUpdateRequest.setCategory(ProductCategory.APPLIANCES);
         productUpdateRequest.setName("Standing Fan");
         productUpdateRequest.setPrice(BigDecimal.valueOf(24000.00));
         productUpdateRequest.setQuantity(20);
-        Response response = productService.updateProduct(productUpdateRequest);
+        Response response = productService.updateProduct(352, productUpdateRequest);
         System.out.println(response);
         assertEquals("Product update successful", response.getMessage());
 
@@ -72,7 +70,7 @@ public class ProductServiceImplTest {
 
     @Test
     void testThatProductCanBeDeleted() {
-        Response deleteResponse = productService.deleteProduct(52);
+        Response deleteResponse = productService.deleteProduct(352);
         System.out.println(deleteResponse);
         assertEquals("Product has been deleted", deleteResponse.getMessage());
     }

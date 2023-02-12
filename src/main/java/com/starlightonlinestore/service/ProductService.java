@@ -12,7 +12,7 @@ public interface ProductService {
     AddProductResponse createProduct(AddProductRequest addProductRequest);
     Product getProductById(int id);
     Response updateProduct
-            (ProductUpdateRequest productUpdateRequest);
+            (Integer id, ProductUpdateRequest productUpdateRequest);
 
     Response deleteProduct(int id);
 
