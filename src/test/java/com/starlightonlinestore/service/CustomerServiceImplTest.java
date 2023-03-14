@@ -23,9 +23,9 @@ public class CustomerServiceImplTest {
 //        firstCustomerRegisterRequest.setEmail("chidioke56@email.com");
 //        firstCustomerRegisterRequest.setPassword("Tomisin97#");
         CustomerRegistrationRequest secondCustomerRegisterRequest = new CustomerRegistrationRequest();
-        secondCustomerRegisterRequest.setFirstName("Tyler");
-        secondCustomerRegisterRequest.setLastName("Scott");
-        secondCustomerRegisterRequest.setEmail("mrjesus@email.com");
+        secondCustomerRegisterRequest.setFirstName("Perry");
+        secondCustomerRegisterRequest.setLastName("Tyler");
+        secondCustomerRegisterRequest.setEmail("mrjesus3003@gmail.com");
         secondCustomerRegisterRequest.setPassword("Dasilva19@");
         String response =
                 customerService.register(secondCustomerRegisterRequest);
@@ -35,8 +35,8 @@ public class CustomerServiceImplTest {
     @Test
     void testThatCustomerAccountHasBeenCreated() {
         VerifyOtpRequest verifyOtpRequest = new VerifyOtpRequest();
-        verifyOtpRequest.setToken("4739");
-        verifyOtpRequest.setEmail("mrjesus@email.com");
+        verifyOtpRequest.setToken("8333");
+        verifyOtpRequest.setEmail("mrjesus3003@gmail.com");
         CustomerRegistrationResponse registrationResponse =
                 customerService.createAccount(verifyOtpRequest);
         assertEquals("User registration successful", registrationResponse.getMessage());
