@@ -29,4 +29,6 @@ public class Customer  {
     private Set<String> deliveryAddress = new HashSet<>();
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<CustomerOrder> customerOrderList = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Cart> customerCart = new ArrayList<>();
 }

@@ -1,6 +1,5 @@
 package com.starlightonlinestore.service;
 
-import com.starlightonlinestore.data.models.Customer;
 import com.starlightonlinestore.data.dto.Request.*;
 import com.starlightonlinestore.data.dto.Response.*;
 import com.starlightonlinestore.data.models.CustomerOrder;
@@ -27,7 +26,8 @@ public interface CustomerService {
 
     Response changePassword(ChangePasswordRequest changePasswordRequest);
 
-    OrderProductResponse orderProduct
-            (Integer id, OrderProductRequest orderProductRequest);
+    Response addProductToCart
+            (Integer id, AddToCartRequest addToCartRequest);
+    Response orderProduct(Integer id, OrderProductRequest orderProductRequest);
     Response updateCustomer(Integer id, UpdateRequest updateRequest);
 }

@@ -63,8 +63,8 @@ public class CustomerController {
     }
 
     @PostMapping("/order/{id}")
-    public ResponseEntity<?> orderProduct(@Valid @RequestBody @PathVariable int id, OrderProductRequest orderProductRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(customerService.orderProduct(id, orderProductRequest));
+    public ResponseEntity<?> addProductToCart(@Valid @RequestBody @PathVariable int id, AddToCartRequest addToCartRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(customerService.addProductToCart(id, addToCartRequest));
     }
 
     @GetMapping

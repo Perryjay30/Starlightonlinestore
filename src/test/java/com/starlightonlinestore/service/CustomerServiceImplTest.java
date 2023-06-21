@@ -1,5 +1,6 @@
 package com.starlightonlinestore.service;
 
+import com.starlightonlinestore.data.models.Cart;
 import com.starlightonlinestore.data.models.ProductCategory;
 import com.starlightonlinestore.data.dto.Request.*;
 import com.starlightonlinestore.data.dto.Response.*;
@@ -7,6 +8,9 @@ import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,7 +39,7 @@ public class CustomerServiceImplTest {
     @Test
     void testThatCustomerAccountHasBeenCreated() {
         VerifyOtpRequest verifyOtpRequest = new VerifyOtpRequest();
-        verifyOtpRequest.setToken("8333");
+        verifyOtpRequest.setToken("4625");
         verifyOtpRequest.setEmail("mrjesus3003@gmail.com");
         CustomerRegistrationResponse registrationResponse =
                 customerService.createAccount(verifyOtpRequest);
@@ -104,20 +108,21 @@ public class CustomerServiceImplTest {
     }
 
     @Test
-    void testThatCustomerCanOrderProduct() {
-        OrderProductRequest orderProductRequest = new OrderProductRequest();
-        orderProductRequest.setQuantity(4);
-        orderProductRequest.setProductName("Versace, Turtle-neck");
-        orderProductRequest.setProductCategory(ProductCategory.GROCERIES);
-        orderProductRequest.setPrice(17000.00);
-        OrderProductResponse orderProductResponse = customerService.orderProduct(1, orderProductRequest);
-        System.out.println(orderProductResponse);
-        assertEquals(201, orderProductResponse.getStatusCode());
+    void testThatCustomerCanAddProductToCart() {
+        AddToCartRequest addToCartRequest= new AddToCartRequest();
+        addToCartRequest.setQuantity(3);
+        addToCartRequest.setProductName("Versace");
+        addToCartRequest.setProductCategory(ProductCategory.APPLIANCES);
+        addToCartRequest.setPrice(17000.00);
+        Response productToCartResponse = customerService.addProductToCart(1, addToCartRequest);
+        assertEquals("Product successfully added to cart", productToCartResponse.getMessage());
     }
 
-
-
-
-
-
+    @Test
+    void testThatCustomerCanOrderProduct() {
+        OrderProductRequest orderProductRequest = new OrderProductRequest();
+        orderProductRequest.setDeliveryAddress("312, Herbert Macualay, Yaba");
+        Response response = customerService.orderProduct(1, orderProductRequest);
+        assertEquals("Order placed", response.getMessage());
+    }
 }

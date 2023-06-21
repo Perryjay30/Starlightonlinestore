@@ -1,9 +1,9 @@
 package com.starlightonlinestore.service;
 
 import com.starlightonlinestore.data.exceptions.CustomerRegistrationException;
-import com.starlightonlinestore.data.models.Customer;
-import com.starlightonlinestore.data.models.CustomerOrder;
-import com.starlightonlinestore.data.models.OTPToken;
+import com.starlightonlinestore.data.models.*;
+//import com.starlightonlinestore.data.repository.CartRepository;
+import com.starlightonlinestore.data.repository.CartRepository;
 import com.starlightonlinestore.data.repository.CustomerRepository;
 import com.starlightonlinestore.data.repository.CustomerOrderRepository;
 import com.starlightonlinestore.data.dto.Request.*;
@@ -13,9 +13,9 @@ import com.starlightonlinestore.utils.validators.EmailService;
 import com.starlightonlinestore.utils.validators.Token;
 import com.starlightonlinestore.utils.validators.UserDetailsValidator;
 import jakarta.mail.MessagingException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mindrot.jbcrypt.BCrypt;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -28,26 +28,15 @@ import static com.starlightonlinestore.data.models.Status.VERIFIED;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
-
     private final CustomerRepository customerRepository;
-
     private final CustomerOrderRepository orderRepository;
-
     private final OtpTokenRepository otpTokenRepository;
-
     private final EmailService emailService;
-
     private final CustomerOrderRepository customerOrderRepository;
 
-    @Autowired
-    public CustomerServiceImpl(CustomerRepository customerRepository, CustomerOrderRepository orderRepository, OtpTokenRepository otpTokenRepository, EmailService emailService, CustomerOrderRepository customerOrderRepository) {
-        this.customerRepository = customerRepository;
-        this.orderRepository = orderRepository;
-        this.otpTokenRepository = otpTokenRepository;
-        this.emailService = emailService;
-        this.customerOrderRepository = customerOrderRepository;
-    }
+    private final CartRepository cartRepository;
 
 
     @Override
@@ -67,8 +56,8 @@ public class CustomerServiceImpl implements CustomerService {
         log.info(verifyOtpRequest.getEmail());
         log.info(verifyOtpRequest.getToken());
         verifyOTP(verifyOtpRequest);
-        var savedCustomer = customerRepository.findByEmail(verifyOtpRequest.getEmail())
-                .orElseThrow(() -> new RuntimeException("Customer does not exists"));
+        var savedCustomer =
+                getFoundCustomer(customerRepository.findByEmail(verifyOtpRequest.getEmail()), "Customer does not exists");
 //        savedCustomer.setStatus(VERIFIED);
 //        customerRepository.save(savedCustomer);
         customerRepository.enableCustomer(VERIFIED, savedCustomer.getEmail());
@@ -93,8 +82,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public String forgotPassword(ForgotPasswordRequest forgotPasswordRequest) throws MessagingException {
-        Customer forgotCustomer = customerRepository.findByEmail(forgotPasswordRequest.getEmail())
-                .orElseThrow(() -> new RuntimeException("This email is not registered"));
+        Customer forgotCustomer = getFoundCustomer(customerRepository.findByEmail(forgotPasswordRequest.getEmail()), "This email is not registered");
         String token = Token.generateToken(4);
         OTPToken otpToken = new OTPToken(token, LocalDateTime.now(), LocalDateTime.now().plusMinutes(10), forgotCustomer);
         otpTokenRepository.save(otpToken);
@@ -132,8 +120,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public String sendOTP(SendOtpRequest sendOtpRequest) {
-        Customer savedCustomer = customerRepository.findByEmail(sendOtpRequest.getEmail())
-                .orElseThrow(() -> new RuntimeException("Email not found"));
+        Customer savedCustomer = getFoundCustomer(customerRepository.findByEmail(sendOtpRequest.getEmail()), "Email not found");
         return generateOtpToken(sendOtpRequest, savedCustomer);
     }
 
@@ -169,8 +156,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public LoginResponse login(LoginRequest loginRequest) {
-        Customer foundCustomer = customerRepository.findByEmail(loginRequest
-                .getEmail()).orElseThrow(() -> new RuntimeException("your email is incorrect"));
+        Customer foundCustomer = getFoundCustomer(customerRepository.findByEmail(loginRequest
+                .getEmail()), "your email is incorrect");
         if(foundCustomer.getStatus() != VERIFIED) throw new RuntimeException("Customer is not verified");
 //      foundCustomer.setEmail(loginRequest.getEmail())
         LoginResponse loginResponse = new LoginResponse();
@@ -185,8 +172,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Response changePassword(ChangePasswordRequest changePasswordRequest) {
-        Customer verifiedCustomer = customerRepository.findByEmail(changePasswordRequest.getEmail())
-                .orElseThrow(() -> new RuntimeException("customer isn't registered"));
+        Customer verifiedCustomer = getFoundCustomer(customerRepository.findByEmail(changePasswordRequest.getEmail()), "customer isn't registered");
         if(BCrypt.checkpw(changePasswordRequest.getOldPassword(), verifiedCustomer.getPassword()))
             verifiedCustomer.setPassword(changePasswordRequest.getNewPassword());
         customerRepository.save(verifiedCustomer);
@@ -194,13 +180,56 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public OrderProductResponse orderProduct(Integer id, OrderProductRequest orderProductRequest) {
+    public Response addProductToCart(Integer id, AddToCartRequest addToCartRequest) {
         Customer customer =
-                customerRepository.findById(id).orElseThrow(() -> new RuntimeException("Kindly enter a valid customer Id"));
-        CustomerOrder order = placingOrder(orderProductRequest);
-        customer.getCustomerOrderList().add(order);
-        CustomerOrder orderedProduct = orderRepository.save(order);
-        return placedOrderResponse(orderedProduct);
+                getFoundCustomer(customerRepository.findById(id), "Kindly enter a valid customer Id");
+        Cart cart = AddingItemsToCart(addToCartRequest);
+        customer.getCustomerCart().add(cart);
+        cartRepository.save(cart);
+        return new Response("Product successfully added to cart");
+    }
+
+    public List<Cart> getAllCart() {
+        return cartRepository.findAll();
+    }
+
+    @Override
+    public Response orderProduct(Integer id, OrderProductRequest orderProductRequest) {
+        Customer customer = getFoundCustomer(customerRepository.findById(id),
+                "Kindly enter a valid customer Id");
+        CustomerOrder customerOrder = new CustomerOrder();
+        customerOrder.setDeliveryAddress(orderProductRequest.getDeliveryAddress());
+        customer.getDeliveryAddress().add(customerOrder.getDeliveryAddress());
+        totalQuantityOfProductInCart(customerOrder);
+        totalAmountOfAllProductInCart(customerOrder);
+        orderRepository.save(customerOrder);
+        return new Response("Kindly proceed to payment to make your order successful");
+    }
+
+    private void totalQuantityOfProductInCart(CustomerOrder customerOrder) {
+        List<Integer> quantityCart = new ArrayList<>();
+        List<Cart> allCart = getAllCart();
+        int sum = 0;
+        for (Cart myCart : allCart) {
+            if(myCart.getQuantity() > 0) quantityCart.add(myCart.getQuantity());
+        }
+        for (int i = 0; i < quantityCart.size(); i++) {
+            sum += quantityCart.get(i);
+        }
+        customerOrder.setItemTotal(sum);
+    }
+
+    private void totalAmountOfAllProductInCart(CustomerOrder customerOrder) {
+        List<Double> totalAmountCart = new ArrayList<>();
+        List<Cart> allCart = getAllCart();
+        double total = 0;
+        for (Cart amountCart : allCart) {
+            if(amountCart.getPrice() > 0) totalAmountCart.add(amountCart.getPrice());
+        }
+        for(int j = 0; j < totalAmountCart.size(); j++) {
+            total += totalAmountCart.get(j);
+        }
+        customerOrder.setTotal(total);
     }
 //        if(product.getQuantity() >= orderProductRequest.getQuantity()) {
 
@@ -213,28 +242,19 @@ public class CustomerServiceImpl implements CustomerService {
 
 //            customerRepository.save(customer);
 
-    private OrderProductResponse placedOrderResponse(CustomerOrder orderedProduct) {
-        OrderProductResponse orderProductResponse = new OrderProductResponse();
-        orderProductResponse.setId(orderedProduct.getId());
-        orderProductResponse.setStatusCode(201);
-        orderProductResponse.setMessage("You just made a successful order");
-        return orderProductResponse;
-    }
-
-    private CustomerOrder placingOrder(OrderProductRequest orderProductRequest) {
-        CustomerOrder order = new CustomerOrder();
-        order.setProductName(orderProductRequest.getProductName());
-        order.setProductCategory(orderProductRequest.getProductCategory());
-        order.setPrice(orderProductRequest.getPrice());
-        order.setQuantity(orderProductRequest.getQuantity());
-        order.setTotal(order.getPrice() * order.getQuantity());
-        return order;
+    private Cart AddingItemsToCart(AddToCartRequest addToCartRequest) {
+        Cart newCart = new Cart();
+        newCart.setProductName(addToCartRequest.getProductName());
+        newCart.setProductCategory(addToCartRequest.getProductCategory());
+        newCart.setPrice(addToCartRequest.getPrice());
+        newCart.setQuantity(addToCartRequest.getQuantity());
+//        order.setTotal(order.getPrice() * order.getQuantity());
+        return newCart;
     }
 
     @Override
     public Response deleteCustomer(int id, DeleteRequest deleteRequest) {
-        Customer foundCustomer = customerRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Customer doesn't exist"));
+        Customer foundCustomer = getFoundCustomer(customerRepository.findById(id), "Customer doesn't exist");
         String randomToken = UUID.randomUUID().toString();
         String encoded = BCrypt.hashpw(randomToken, BCrypt.gensalt());
         if (BCrypt.checkpw(deleteRequest.getPassword(), foundCustomer.getPassword())) {
@@ -245,6 +265,11 @@ public class CustomerServiceImpl implements CustomerService {
         } else {
             throw new RuntimeException("Customer can't be deleted");
         }
+    }
+
+    private Customer getFoundCustomer(Optional<Customer> customerRepository, String message) {
+        return customerRepository.orElseThrow(
+                () -> new RuntimeException(message));
     }
 
     @Override
@@ -280,6 +305,4 @@ public class CustomerServiceImpl implements CustomerService {
                 .equals("") ? updateRequest.getEmail() : foundCustomer.getEmail());
         return foundCustomer;
     }
-
-
 }

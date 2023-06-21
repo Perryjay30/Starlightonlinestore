@@ -6,12 +6,5 @@ import lombok.Data;
 
 @Data
 public class OrderProductRequest {
-    @NotBlank(message = "This field is required")
-    private String productName;
-    @NotBlank(message = "This field is required")
-    private ProductCategory productCategory;
-    @NotBlank(message = "This field is required")
-    private double price;
-    @NotBlank(message = "This field is required")
-    private int quantity;
+    private String deliveryAddress;
 }
