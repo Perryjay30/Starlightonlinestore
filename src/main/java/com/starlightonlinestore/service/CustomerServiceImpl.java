@@ -1,11 +1,8 @@
 package com.starlightonlinestore.service;
 
 import com.starlightonlinestore.data.exceptions.CustomerRegistrationException;
-import com.starlightonlinestore.data.exceptions.StoreException;
 import com.starlightonlinestore.data.models.*;
-import com.starlightonlinestore.data.repository.CartRepository;
 import com.starlightonlinestore.data.repository.CustomerRepository;
-import com.starlightonlinestore.data.repository.CustomerOrderRepository;
 import com.starlightonlinestore.data.dto.Request.*;
 import com.starlightonlinestore.data.dto.Response.*;
 import com.starlightonlinestore.data.repository.OtpTokenRepository;
@@ -18,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -32,13 +28,8 @@ import static com.starlightonlinestore.data.models.Status.VERIFIED;
 @RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
-    private final CustomerOrderRepository orderRepository;
     private final OtpTokenRepository otpTokenRepository;
     private final EmailService emailService;
-    private final CustomerOrderRepository customerOrderRepository;
-    private final CartRepository cartRepository;
-
-    private final PaymentService paymentService;
 
 
     @Override
@@ -182,96 +173,6 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public StoreResponse addProductToCart(Integer id, AddToCartRequest addToCartRequest) {
-        Customer customer =
-                getFoundCustomer(customerRepository.findById(id), "Kindly enter a valid customer Id");
-        Cart cart = AddingItemsToCart(addToCartRequest);
-        customer.getCustomerCart().add(cart);
-        cartRepository.save(cart);
-        return new StoreResponse("Product successfully added to cart");
-    }
-
-    public List<Cart> getAllCart() {
-        return cartRepository.findAll();
-    }
-
-    @Override
-    public StoreResponse orderProduct(Integer id, OrderProductRequest orderProductRequest) {
-        Customer customer = getFoundCustomer(customerRepository.findById(id),
-                "Kindly enter a valid customer Id");
-        CustomerOrder customerOrder = new CustomerOrder();
-        customerOrder.setDeliveryAddress(orderProductRequest.getDeliveryAddress());
-        customer.getDeliveryAddress().add(customerOrder.getDeliveryAddress());
-        customerOrder.setLocalDateTime(LocalDateTime.now());
-        customerOrder.setOrderStatus(OrderStatus.PENDING);
-        customerOrder.setPaymentStatus(PaymentStatus.PROCESSING);
-        totalQuantityOfProductInCart(customerOrder);
-        totalAmountOfAllProductInCart(customerOrder);
-        orderRepository.save(customerOrder);
-        return new StoreResponse("Kindly proceed to payment to make your order successful");
-    }
-
-    @Override
-    public StoreResponse CustomerCanMakePaymentForGoodsOrdered(Integer customerId, Integer orderId, PaymentRequest paymentRequest) throws IOException, MessagingException {
-        Customer existingCustomer = getFoundCustomer(customerRepository.findById(customerId), "Customer doesn't exist");
-        CustomerOrder customerOrder = customerOrderRepository.findById(orderId)
-                .orElseThrow(() -> new StoreException("Goods wasn't ordered"));
-        paymentService.makePaymentForGoods(paymentRequest);
-        customerOrder.setOrderStatus(OrderStatus.ORDER_SUCCESSFUL);
-        customerOrder.setPaymentStatus(PaymentStatus.PAYMENT_SUCCESSFUL);
-        cartRepository.deleteAll();
-        emailService.sendEmailForSuccessfulOrder(existingCustomer.getEmail(), existingCustomer.getFirstName(), customerOrder.getOrderId());
-        return new StoreResponse("Order placed, Check your email for notification");
-    }
-
-    private void totalQuantityOfProductInCart(CustomerOrder customerOrder) {
-        List<Integer> quantityCart = new ArrayList<>();
-        List<Cart> allCart = getAllCart();
-        int sum = 0;
-        for (Cart myCart : allCart) {
-            if(myCart.getQuantity() > 0) quantityCart.add(myCart.getQuantity());
-        }
-        for (int i = 0; i < quantityCart.size(); i++) {
-            sum += quantityCart.get(i);
-        }
-        customerOrder.setItemTotal(sum);
-    }
-
-    private void totalAmountOfAllProductInCart(CustomerOrder customerOrder) {
-        List<Double> totalAmountCart = new ArrayList<>();
-        List<Cart> allCart = getAllCart();
-        double total = 0;
-        for (Cart amountCart : allCart) {
-            if(amountCart.getPrice() > 0) totalAmountCart.add(amountCart.getPrice());
-        }
-        for(int j = 0; j < totalAmountCart.size(); j++) {
-            total += totalAmountCart.get(j);
-        }
-        customerOrder.setTotal(total);
-    }
-//        if(product.getQuantity() >= orderProductRequest.getQuantity()) {
-
-
-//        }
-//        else
-//            throw new RuntimeException("order quantity larger than available quantity");
-
-
-
-//            customerRepository.save(customer);
-
-    private Cart AddingItemsToCart(AddToCartRequest addToCartRequest) {
-        Cart newCart = new Cart();
-        newCart.setProductName(addToCartRequest.getProductName());
-        newCart.setProductCategory(addToCartRequest.getProductCategory());
-        newCart.setPrice(addToCartRequest.getPrice());
-        newCart.setQuantity(addToCartRequest.getQuantity());
-        newCart.setLocalDateTime(LocalDateTime.now());
-//        order.setTotal(order.getPrice() * order.getQuantity());
-        return newCart;
-    }
-
-    @Override
     public StoreResponse deleteCustomer(int id, DeleteRequest deleteRequest) {
         Customer foundCustomer = getFoundCustomer(customerRepository.findById(id), "Customer doesn't exist");
         String randomToken = UUID.randomUUID().toString();
@@ -286,14 +187,9 @@ public class CustomerServiceImpl implements CustomerService {
         }
     }
 
-    private Customer getFoundCustomer(Optional<Customer> customerRepository, String message) {
+    public Customer getFoundCustomer(Optional<Customer> customerRepository, String message) {
         return customerRepository.orElseThrow(
                 () -> new RuntimeException(message));
-    }
-
-    @Override
-    public List<CustomerOrder> getAllOrders() {
-        return customerOrderRepository.findAll();
     }
 
     @Override

@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class CustomerServiceImplTest {
     @Autowired
     private CustomerService customerService;
-
     @Test
     void testThatCustomerCanRegister() {
 //        CustomerRegistrationRequest firstCustomerRegisterRequest = new CustomerRegistrationRequest();
@@ -103,22 +102,4 @@ public class CustomerServiceImplTest {
         assertEquals("Customer deleted", deleteResponse.getMessage());
     }
 
-    @Test
-    void testThatCustomerCanAddProductToCart() {
-        AddToCartRequest addToCartRequest= new AddToCartRequest();
-        addToCartRequest.setQuantity(10);
-        addToCartRequest.setProductName("Dell Laptop");
-        addToCartRequest.setProductCategory(ProductCategory.COMPUTING);
-        addToCartRequest.setPrice(166000.00);
-        StoreResponse productToCartResponse = customerService.addProductToCart(1, addToCartRequest);
-        assertEquals("Product successfully added to cart", productToCartResponse.getMessage());
-    }
-
-    @Test
-    void testThatCustomerCanOrderProduct() {
-        OrderProductRequest orderProductRequest = new OrderProductRequest();
-        orderProductRequest.setDeliveryAddress("312, Herbert Macualay, Yaba");
-        StoreResponse response = customerService.orderProduct(1, orderProductRequest);
-        assertEquals("Order placed", response.getMessage());
-    }
 }

@@ -21,15 +21,12 @@ public interface CustomerService {
     StoreResponse resetPassword(ResetPasswordRequest resetPasswordRequest);
 
     String sendOTP(SendOtpRequest sendOtpRequest);
+
     LoginResponse login(LoginRequest loginRequest);
+
     StoreResponse deleteCustomer(int id, DeleteRequest deleteRequest);
-    List<CustomerOrder> getAllOrders();
 
     StoreResponse changePassword(ChangePasswordRequest changePasswordRequest);
 
-    StoreResponse addProductToCart
-            (Integer id, AddToCartRequest addToCartRequest);
-    StoreResponse orderProduct(Integer id, OrderProductRequest orderProductRequest);
     StoreResponse updateCustomer(Integer id, UpdateRequest updateRequest);
-    StoreResponse CustomerCanMakePaymentForGoodsOrdered(Integer customerId, Integer orderId, PaymentRequest paymentRequest) throws IOException, MessagingException;
 }

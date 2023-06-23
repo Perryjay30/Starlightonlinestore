@@ -23,9 +23,6 @@ public class CustomerController {
     @Autowired
     private CustomerService customerService;
 
-    @Autowired
-    private PaymentService paymentService;
-
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody CustomerRegistrationRequest
                                               customerRegistrationRequest) {
@@ -67,21 +64,6 @@ public class CustomerController {
     @PatchMapping("/{id}")
     public ResponseEntity<?> updateCustomer(@Valid @RequestBody @PathVariable int id, UpdateRequest updateRequest) {
        return ResponseEntity.ok(customerService.updateCustomer(id, updateRequest));
-    }
-
-    @PostMapping("/order/{id}")
-    public ResponseEntity<?> addProductToCart(@Valid @RequestBody @PathVariable int id, AddToCartRequest addToCartRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(customerService.addProductToCart(id, addToCartRequest));
-    }
-
-    @GetMapping
-    public ResponseEntity<?> getAllMyOrders() {
-        return ResponseEntity.ok(customerService.getAllOrders());
-    }
-
-    @PostMapping("/makePayment/{customerId}/{orderId}")
-    public ResponseEntity<?> makePaymentForGoods(@PathVariable Integer customerId, @PathVariable Integer orderId, @RequestBody PaymentRequest paymentRequest) throws IOException, MessagingException {
-        return ResponseEntity.ok(customerService.CustomerCanMakePaymentForGoodsOrdered(customerId, orderId, paymentRequest));
     }
 
 }
