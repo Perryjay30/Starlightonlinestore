@@ -6,7 +6,7 @@ import com.starlightonlinestore.data.repository.ProductRepository;
 import com.starlightonlinestore.data.dto.Request.AddProductRequest;
 import com.starlightonlinestore.data.dto.Request.ProductUpdateRequest;
 import com.starlightonlinestore.data.dto.Response.AddProductResponse;
-import com.starlightonlinestore.data.dto.Response.Response;
+import com.starlightonlinestore.data.dto.Response.StoreResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,12 +42,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Response updateProduct(Integer id, ProductUpdateRequest productUpdateRequest) {
+    public StoreResponse updateProduct(Integer id, ProductUpdateRequest productUpdateRequest) {
         var foundProduct = productRepository.findById(id);
         if(foundProduct.isEmpty()) throw new RuntimeException("Product cannot be found");
         Product replaceProduct = updatingProduct(id, productUpdateRequest);
         productRepository.save(replaceProduct);
-        return new Response("Product update successful");
+        return new StoreResponse("Product update successful");
     }
 
     private Product updatingProduct(Integer id, ProductUpdateRequest productUpdateRequest) {
@@ -72,9 +72,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Response deleteProduct(int id) {
+    public StoreResponse deleteProduct(int id) {
         productRepository.deleteById(id);
-        return new Response("Product has been deleted");
+        return new StoreResponse("Product has been deleted");
     }
 
 

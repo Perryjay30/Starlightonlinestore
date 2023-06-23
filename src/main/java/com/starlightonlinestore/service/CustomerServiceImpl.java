@@ -1,8 +1,8 @@
 package com.starlightonlinestore.service;
 
 import com.starlightonlinestore.data.exceptions.CustomerRegistrationException;
+import com.starlightonlinestore.data.exceptions.StoreException;
 import com.starlightonlinestore.data.models.*;
-//import com.starlightonlinestore.data.repository.CartRepository;
 import com.starlightonlinestore.data.repository.CartRepository;
 import com.starlightonlinestore.data.repository.CustomerRepository;
 import com.starlightonlinestore.data.repository.CustomerOrderRepository;
@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -35,8 +36,9 @@ public class CustomerServiceImpl implements CustomerService {
     private final OtpTokenRepository otpTokenRepository;
     private final EmailService emailService;
     private final CustomerOrderRepository customerOrderRepository;
-
     private final CartRepository cartRepository;
+
+    private final PaymentService paymentService;
 
 
     @Override
@@ -94,13 +96,13 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Response resetPassword(ResetPasswordRequest resetPasswordRequest) {
+    public StoreResponse resetPassword(ResetPasswordRequest resetPasswordRequest) {
         verifyOtpForResetPassword(resetPasswordRequest);
         Customer foundCustomer = customerRepository.findByEmail(resetPasswordRequest.getEmail()).get();
         foundCustomer.setPassword(resetPasswordRequest.getPassword());
         if(BCrypt.checkpw(resetPasswordRequest.getConfirmPassword(), resetPasswordRequest.getPassword())) {
             customerRepository.save(foundCustomer);
-            return new Response("Your password has been reset successfully");
+            return new StoreResponse("Your password has been reset successfully");
         } else {
             throw new IllegalStateException("Password does not match");
         }
@@ -171,22 +173,22 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Response changePassword(ChangePasswordRequest changePasswordRequest) {
+    public StoreResponse changePassword(ChangePasswordRequest changePasswordRequest) {
         Customer verifiedCustomer = getFoundCustomer(customerRepository.findByEmail(changePasswordRequest.getEmail()), "customer isn't registered");
         if(BCrypt.checkpw(changePasswordRequest.getOldPassword(), verifiedCustomer.getPassword()))
             verifiedCustomer.setPassword(changePasswordRequest.getNewPassword());
         customerRepository.save(verifiedCustomer);
-        return new Response("Your password has been successfully changed");
+        return new StoreResponse("Your password has been successfully changed");
     }
 
     @Override
-    public Response addProductToCart(Integer id, AddToCartRequest addToCartRequest) {
+    public StoreResponse addProductToCart(Integer id, AddToCartRequest addToCartRequest) {
         Customer customer =
                 getFoundCustomer(customerRepository.findById(id), "Kindly enter a valid customer Id");
         Cart cart = AddingItemsToCart(addToCartRequest);
         customer.getCustomerCart().add(cart);
         cartRepository.save(cart);
-        return new Response("Product successfully added to cart");
+        return new StoreResponse("Product successfully added to cart");
     }
 
     public List<Cart> getAllCart() {
@@ -194,16 +196,32 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Response orderProduct(Integer id, OrderProductRequest orderProductRequest) {
+    public StoreResponse orderProduct(Integer id, OrderProductRequest orderProductRequest) {
         Customer customer = getFoundCustomer(customerRepository.findById(id),
                 "Kindly enter a valid customer Id");
         CustomerOrder customerOrder = new CustomerOrder();
         customerOrder.setDeliveryAddress(orderProductRequest.getDeliveryAddress());
         customer.getDeliveryAddress().add(customerOrder.getDeliveryAddress());
+        customerOrder.setLocalDateTime(LocalDateTime.now());
+        customerOrder.setOrderStatus(OrderStatus.PENDING);
+        customerOrder.setPaymentStatus(PaymentStatus.PROCESSING);
         totalQuantityOfProductInCart(customerOrder);
         totalAmountOfAllProductInCart(customerOrder);
         orderRepository.save(customerOrder);
-        return new Response("Kindly proceed to payment to make your order successful");
+        return new StoreResponse("Kindly proceed to payment to make your order successful");
+    }
+
+    @Override
+    public StoreResponse CustomerCanMakePaymentForGoodsOrdered(Integer customerId, Integer orderId, PaymentRequest paymentRequest) throws IOException, MessagingException {
+        Customer existingCustomer = getFoundCustomer(customerRepository.findById(customerId), "Customer doesn't exist");
+        CustomerOrder customerOrder = customerOrderRepository.findById(orderId)
+                .orElseThrow(() -> new StoreException("Goods wasn't ordered"));
+        paymentService.makePaymentForGoods(paymentRequest);
+        customerOrder.setOrderStatus(OrderStatus.ORDER_SUCCESSFUL);
+        customerOrder.setPaymentStatus(PaymentStatus.PAYMENT_SUCCESSFUL);
+        cartRepository.deleteAll();
+        emailService.sendEmailForSuccessfulOrder(existingCustomer.getEmail(), existingCustomer.getFirstName(), customerOrder.getOrderId());
+        return new StoreResponse("Order placed, Check your email for notification");
     }
 
     private void totalQuantityOfProductInCart(CustomerOrder customerOrder) {
@@ -248,12 +266,13 @@ public class CustomerServiceImpl implements CustomerService {
         newCart.setProductCategory(addToCartRequest.getProductCategory());
         newCart.setPrice(addToCartRequest.getPrice());
         newCart.setQuantity(addToCartRequest.getQuantity());
+        newCart.setLocalDateTime(LocalDateTime.now());
 //        order.setTotal(order.getPrice() * order.getQuantity());
         return newCart;
     }
 
     @Override
-    public Response deleteCustomer(int id, DeleteRequest deleteRequest) {
+    public StoreResponse deleteCustomer(int id, DeleteRequest deleteRequest) {
         Customer foundCustomer = getFoundCustomer(customerRepository.findById(id), "Customer doesn't exist");
         String randomToken = UUID.randomUUID().toString();
         String encoded = BCrypt.hashpw(randomToken, BCrypt.gensalt());
@@ -261,7 +280,7 @@ public class CustomerServiceImpl implements CustomerService {
             String deleteCustomer = "Deleted" + " " + foundCustomer.getEmail() + " " + encoded;
             foundCustomer.setEmail(deleteCustomer);
             customerRepository.save(foundCustomer);
-            return new Response("Customer deleted");
+            return new StoreResponse("Customer deleted");
         } else {
             throw new RuntimeException("Customer can't be deleted");
         }
@@ -278,12 +297,12 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Response updateCustomer(Integer id, UpdateRequest updateRequest) {
+    public StoreResponse updateCustomer(Integer id, UpdateRequest updateRequest) {
         var customer = customerRepository.findById(id);
         if (customer.isEmpty()) throw new RuntimeException("customer not found");
         Customer foundCustomer = updatingTheCustomer(updateRequest, customer);
         customerRepository.save(foundCustomer);
-        return new Response("Customer updated successfully");
+        return new StoreResponse("Customer updated successfully");
     }
 
     private Customer updatingTheCustomer(UpdateRequest updateRequest, Optional<Customer> customer) {

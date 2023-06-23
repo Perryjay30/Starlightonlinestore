@@ -3,7 +3,7 @@ package com.starlightonlinestore.service;
 import com.starlightonlinestore.data.dto.Request.*;
 import com.starlightonlinestore.data.dto.Response.CreateVendorResponse;
 import com.starlightonlinestore.data.dto.Response.LoginResponse;
-import com.starlightonlinestore.data.dto.Response.Response;
+import com.starlightonlinestore.data.dto.Response.StoreResponse;
 import jakarta.mail.MessagingException;
 
 public interface VendorService {
@@ -14,15 +14,15 @@ void verifyOTP(VerifyOtpRequest verifyOtpRequest);
 
 String forgotPassword(ForgotPasswordRequest forgotPasswordRequest) throws MessagingException;
 
-Response resetPassword(ResetPasswordRequest resetPasswordRequest);
+StoreResponse resetPassword(ResetPasswordRequest resetPasswordRequest);
 
 String sendOTP(SendOtpRequest sendOtpRequest);
 LoginResponse login(LoginRequest loginRequest);
-Response updateVendor(Integer id, UpdateRequest updateRequest);
+StoreResponse updateVendor(Integer id, UpdateRequest updateRequest);
 
-Response deleteVendor(Integer id, DeleteRequest deleteRequest);
-Response changePassword(ChangePasswordRequest changePasswordRequest);
+StoreResponse deleteVendor(Integer id, DeleteRequest deleteRequest);
+StoreResponse changePassword(ChangePasswordRequest changePasswordRequest);
 
-Response addProduct(int id, AddProductRequest addProductRequest);
+StoreResponse addProduct(int id, AddProductRequest addProductRequest);
 
 }

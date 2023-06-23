@@ -4,8 +4,7 @@ import com.starlightonlinestore.data.models.ProductCategory;
 import com.starlightonlinestore.data.dto.Request.AddProductRequest;
 import com.starlightonlinestore.data.dto.Response.AddProductResponse;
 import com.starlightonlinestore.data.dto.Request.ProductUpdateRequest;
-import com.starlightonlinestore.data.dto.Response.Response;
-import com.starlightonlinestore.service.ProductService;
+import com.starlightonlinestore.data.dto.Response.StoreResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +61,7 @@ public class ProductServiceImplTest {
         productUpdateRequest.setName("Standing Fan");
         productUpdateRequest.setPrice(BigDecimal.valueOf(24000.00));
         productUpdateRequest.setQuantity(20);
-        Response response = productService.updateProduct(352, productUpdateRequest);
+        StoreResponse response = productService.updateProduct(352, productUpdateRequest);
         System.out.println(response);
         assertEquals("Product update successful", response.getMessage());
 
@@ -70,7 +69,7 @@ public class ProductServiceImplTest {
 
     @Test
     void testThatProductCanBeDeleted() {
-        Response deleteResponse = productService.deleteProduct(352);
+        StoreResponse deleteResponse = productService.deleteProduct(352);
         System.out.println(deleteResponse);
         assertEquals("Product has been deleted", deleteResponse.getMessage());
     }

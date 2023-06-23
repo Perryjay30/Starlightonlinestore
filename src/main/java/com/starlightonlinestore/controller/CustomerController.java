@@ -1,7 +1,9 @@
 package com.starlightonlinestore.controller;
 
 import com.starlightonlinestore.data.dto.Request.*;
+import com.starlightonlinestore.data.dto.Response.PaymentResponse;
 import com.starlightonlinestore.service.CustomerService;
+import com.starlightonlinestore.service.PaymentService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/customer")
@@ -18,6 +22,9 @@ public class CustomerController {
 
     @Autowired
     private CustomerService customerService;
+
+    @Autowired
+    private PaymentService paymentService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody CustomerRegistrationRequest
@@ -71,4 +78,10 @@ public class CustomerController {
     public ResponseEntity<?> getAllMyOrders() {
         return ResponseEntity.ok(customerService.getAllOrders());
     }
+
+    @PostMapping("/makePayment/{customerId}/{orderId}")
+    public ResponseEntity<?> makePaymentForGoods(@PathVariable Integer customerId, @PathVariable Integer orderId, @RequestBody PaymentRequest paymentRequest) throws IOException, MessagingException {
+        return ResponseEntity.ok(customerService.CustomerCanMakePaymentForGoodsOrdered(customerId, orderId, paymentRequest));
+    }
+
 }

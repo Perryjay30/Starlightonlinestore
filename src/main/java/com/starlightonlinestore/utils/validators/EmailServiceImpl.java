@@ -60,10 +60,25 @@ public class EmailServiceImpl implements EmailService {
                 + "or you have not made the request.</p>";
 
         helper.setSubject(subject);
-
         helper.setText(content, true);
-
         javaMailSender.send(message);
+    }
+
+    @Override
+    public void sendEmailForSuccessfulOrder(String recipientEmail, String name, Integer orderId) throws MessagingException {
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
+        messageHelper.setFrom("pelumijsh@gmail.com");
+        messageHelper.setTo(recipientEmail);
+        String subject = "Successful Order";
+        String content = "<p>Hello" + name + ",</p>"
+                + "<p>You have successfully placed an order. Your goods will be delivered to you within " +
+                "3 - 4 business working days</p>"
+                + "<p>Here is your orderId</p>" + orderId
+                + "<p>. Thank you for choosing Starlight Online Store!!!.</p>";
+        messageHelper.setSubject(subject);
+        messageHelper.setText(content, true);
+        javaMailSender.send(mimeMessage);
     }
 
     public String buildEmail(String name, String link) {

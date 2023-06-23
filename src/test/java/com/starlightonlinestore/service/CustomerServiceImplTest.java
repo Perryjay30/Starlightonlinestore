@@ -1,6 +1,5 @@
 package com.starlightonlinestore.service;
 
-import com.starlightonlinestore.data.models.Cart;
 import com.starlightonlinestore.data.models.ProductCategory;
 import com.starlightonlinestore.data.dto.Request.*;
 import com.starlightonlinestore.data.dto.Response.*;
@@ -8,9 +7,6 @@ import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,9 +23,9 @@ public class CustomerServiceImplTest {
 //        firstCustomerRegisterRequest.setEmail("chidioke56@email.com");
 //        firstCustomerRegisterRequest.setPassword("Tomisin97#");
         CustomerRegistrationRequest secondCustomerRegisterRequest = new CustomerRegistrationRequest();
-        secondCustomerRegisterRequest.setFirstName("Perry");
-        secondCustomerRegisterRequest.setLastName("Tyler");
-        secondCustomerRegisterRequest.setEmail("mrjesus3003@gmail.com");
+        secondCustomerRegisterRequest.setFirstName("Ajoke");
+        secondCustomerRegisterRequest.setLastName("Taiwo");
+        secondCustomerRegisterRequest.setEmail("adebolexsewa@gmail.com");
         secondCustomerRegisterRequest.setPassword("Dasilva19@");
         String response =
                 customerService.register(secondCustomerRegisterRequest);
@@ -39,8 +35,8 @@ public class CustomerServiceImplTest {
     @Test
     void testThatCustomerAccountHasBeenCreated() {
         VerifyOtpRequest verifyOtpRequest = new VerifyOtpRequest();
-        verifyOtpRequest.setToken("4625");
-        verifyOtpRequest.setEmail("mrjesus3003@gmail.com");
+        verifyOtpRequest.setToken("0661");
+        verifyOtpRequest.setEmail("adebolexsewa@gmail.com");
         CustomerRegistrationResponse registrationResponse =
                 customerService.createAccount(verifyOtpRequest);
         assertEquals("User registration successful", registrationResponse.getMessage());
@@ -61,7 +57,7 @@ public class CustomerServiceImplTest {
         changePasswordRequest.setEmail("chidioke56@email.com");
         changePasswordRequest.setOldPassword("Tomisin97#");
         changePasswordRequest.setNewPassword("ChangePass!28");
-        Response resp = customerService.changePassword(changePasswordRequest);
+        StoreResponse resp = customerService.changePassword(changePasswordRequest);
         assertEquals("Your password has been successfully changed", resp.getMessage());
     }
 
@@ -80,7 +76,7 @@ public class CustomerServiceImplTest {
         resetPasswordRequest.setEmail("mrjesus@email.com");
         resetPasswordRequest.setPassword("Nightingale@90");
         resetPasswordRequest.setConfirmPassword("Nightingale@90");
-        Response answer = customerService.resetPassword(resetPasswordRequest);
+        StoreResponse answer = customerService.resetPassword(resetPasswordRequest);
         assertEquals("Your password has been reset successfully", answer.getMessage());
     }
 
@@ -93,7 +89,7 @@ public class CustomerServiceImplTest {
         updateCustomer.setLastName("Davies");
         updateCustomer.setPhone( "07035893966");
         updateCustomer.setPassword("Englandmoro678#");
-        Response updateCustomerResponse =
+        StoreResponse updateCustomerResponse =
                 customerService.updateCustomer(1, updateCustomer);
         System.out.println(updateCustomerResponse);
         assertEquals("Customer updated successfully", updateCustomerResponse.getMessage());
@@ -103,18 +99,18 @@ public class CustomerServiceImplTest {
     void testThatCustomerCanBeDeleted() {
         DeleteRequest deleteRequest = new DeleteRequest();
         deleteRequest.setPassword("Nightingale@90");
-        Response deleteResponse = customerService.deleteCustomer(2, deleteRequest);
+        StoreResponse deleteResponse = customerService.deleteCustomer(2, deleteRequest);
         assertEquals("Customer deleted", deleteResponse.getMessage());
     }
 
     @Test
     void testThatCustomerCanAddProductToCart() {
         AddToCartRequest addToCartRequest= new AddToCartRequest();
-        addToCartRequest.setQuantity(3);
-        addToCartRequest.setProductName("Versace");
-        addToCartRequest.setProductCategory(ProductCategory.APPLIANCES);
-        addToCartRequest.setPrice(17000.00);
-        Response productToCartResponse = customerService.addProductToCart(1, addToCartRequest);
+        addToCartRequest.setQuantity(10);
+        addToCartRequest.setProductName("Dell Laptop");
+        addToCartRequest.setProductCategory(ProductCategory.COMPUTING);
+        addToCartRequest.setPrice(166000.00);
+        StoreResponse productToCartResponse = customerService.addProductToCart(1, addToCartRequest);
         assertEquals("Product successfully added to cart", productToCartResponse.getMessage());
     }
 
@@ -122,7 +118,7 @@ public class CustomerServiceImplTest {
     void testThatCustomerCanOrderProduct() {
         OrderProductRequest orderProductRequest = new OrderProductRequest();
         orderProductRequest.setDeliveryAddress("312, Herbert Macualay, Yaba");
-        Response response = customerService.orderProduct(1, orderProductRequest);
+        StoreResponse response = customerService.orderProduct(1, orderProductRequest);
         assertEquals("Order placed", response.getMessage());
     }
 }

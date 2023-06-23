@@ -1,13 +1,11 @@
 package com.starlightonlinestore.service;
 
 import com.starlightonlinestore.data.dto.Request.*;
-import com.starlightonlinestore.data.dto.Response.CustomerRegistrationResponse;
 import com.starlightonlinestore.data.models.ProductCategory;
 import com.starlightonlinestore.data.dto.Response.CreateVendorResponse;
 import com.starlightonlinestore.data.dto.Response.LoginResponse;
-import com.starlightonlinestore.data.dto.Response.Response;
+import com.starlightonlinestore.data.dto.Response.StoreResponse;
 import jakarta.mail.MessagingException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -58,7 +56,7 @@ class VendorServiceImplTest {
         changePasswordRequest.setEmail("helloworld@gmail.com");
         changePasswordRequest.setOldPassword("Iamnotalone#12");
         changePasswordRequest.setNewPassword("ChangePass!28");
-        Response resp = vendorService.changePassword(changePasswordRequest);
+        StoreResponse resp = vendorService.changePassword(changePasswordRequest);
         assertEquals("Your password has been successfully changed", resp.getMessage());
     }
 
@@ -77,7 +75,7 @@ class VendorServiceImplTest {
         resetPasswordRequest.setEmail("helloworld@gmail.com");
         resetPasswordRequest.setPassword("Nightingale@90");
         resetPasswordRequest.setConfirmPassword("Nightingale@90");
-        Response answer = vendorService.resetPassword(resetPasswordRequest);
+        StoreResponse answer = vendorService.resetPassword(resetPasswordRequest);
         assertEquals("Your password has been reset successfully", answer.getMessage());
     }
 
@@ -89,7 +87,7 @@ class VendorServiceImplTest {
         requestUpdate.setEmail("daredevil@yahoo.com");
         requestUpdate.setStoreAddress("312 Portland region, Oregon");
         requestUpdate.setStoreName("Heartland Software");
-        Response updateResponse = vendorService.updateVendor(1, requestUpdate);
+        StoreResponse updateResponse = vendorService.updateVendor(1, requestUpdate);
         System.out.println(updateResponse);
         assertEquals("Vendor has been updated", updateResponse.getMessage());
     }
@@ -98,7 +96,7 @@ class VendorServiceImplTest {
     void deleteVendor() {
         DeleteRequest deleteRequest = new DeleteRequest();
         deleteRequest.setPassword("Nightingale@90");
-        Response delResponse = vendorService.deleteVendor(1, deleteRequest);
+        StoreResponse delResponse = vendorService.deleteVendor(1, deleteRequest);
         System.out.println(delResponse);
         assertEquals("Vendor deleted", delResponse.getMessage());
     }
@@ -110,7 +108,7 @@ class VendorServiceImplTest {
         productRequest.setPrice(BigDecimal.valueOf(149000));
         productRequest.setProductQuantity(5);
         productRequest.setCategory(ProductCategory.GROCERIES);
-        Response response = vendorService.addProduct(1, productRequest);
+        StoreResponse response = vendorService.addProduct(1, productRequest);
         assertEquals("Product has been added successfully", response.getMessage());
     }
 }

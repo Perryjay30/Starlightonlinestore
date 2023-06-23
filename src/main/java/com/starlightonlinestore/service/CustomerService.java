@@ -5,6 +5,7 @@ import com.starlightonlinestore.data.dto.Response.*;
 import com.starlightonlinestore.data.models.CustomerOrder;
 import jakarta.mail.MessagingException;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -17,17 +18,18 @@ public interface CustomerService {
 
     String forgotPassword(ForgotPasswordRequest forgotPasswordRequest) throws MessagingException;
 
-    Response resetPassword(ResetPasswordRequest resetPasswordRequest);
+    StoreResponse resetPassword(ResetPasswordRequest resetPasswordRequest);
 
     String sendOTP(SendOtpRequest sendOtpRequest);
     LoginResponse login(LoginRequest loginRequest);
-    Response deleteCustomer(int id, DeleteRequest deleteRequest);
+    StoreResponse deleteCustomer(int id, DeleteRequest deleteRequest);
     List<CustomerOrder> getAllOrders();
 
-    Response changePassword(ChangePasswordRequest changePasswordRequest);
+    StoreResponse changePassword(ChangePasswordRequest changePasswordRequest);
 
-    Response addProductToCart
+    StoreResponse addProductToCart
             (Integer id, AddToCartRequest addToCartRequest);
-    Response orderProduct(Integer id, OrderProductRequest orderProductRequest);
-    Response updateCustomer(Integer id, UpdateRequest updateRequest);
+    StoreResponse orderProduct(Integer id, OrderProductRequest orderProductRequest);
+    StoreResponse updateCustomer(Integer id, UpdateRequest updateRequest);
+    StoreResponse CustomerCanMakePaymentForGoodsOrdered(Integer customerId, Integer orderId, PaymentRequest paymentRequest) throws IOException, MessagingException;
 }

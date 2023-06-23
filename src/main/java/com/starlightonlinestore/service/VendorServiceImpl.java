@@ -8,7 +8,7 @@ import com.starlightonlinestore.data.repository.ProductRepository;
 import com.starlightonlinestore.data.repository.VendorRepository;
 import com.starlightonlinestore.data.dto.Response.CreateVendorResponse;
 import com.starlightonlinestore.data.dto.Response.LoginResponse;
-import com.starlightonlinestore.data.dto.Response.Response;
+import com.starlightonlinestore.data.dto.Response.StoreResponse;
 import com.starlightonlinestore.utils.validators.EmailService;
 import com.starlightonlinestore.utils.validators.Token;
 import com.starlightonlinestore.utils.validators.UserDetailsValidator;
@@ -137,13 +137,13 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
-    public Response resetPassword(ResetPasswordRequest resetPasswordRequest) {
+    public StoreResponse resetPassword(ResetPasswordRequest resetPasswordRequest) {
         OtpVerificationForResetPassword(resetPasswordRequest);
         Vendor lostVendor = vendorRepository.findByEmail(resetPasswordRequest.getEmail()).get();
         lostVendor.setPassword(resetPasswordRequest.getPassword());
         if(BCrypt.checkpw(resetPasswordRequest.getConfirmPassword(), resetPasswordRequest.getPassword())) {
             vendorRepository.save(lostVendor);
-            return new Response("Your password has been reset successfully");
+            return new StoreResponse("Your password has been reset successfully");
         } else {
             throw new IllegalStateException("Password does not match");
         }
@@ -176,23 +176,23 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
-    public Response changePassword(ChangePasswordRequest changePasswordRequest) {
+    public StoreResponse changePassword(ChangePasswordRequest changePasswordRequest) {
         Vendor verifiedVendor = vendorRepository.findByEmail(changePasswordRequest.getEmail())
                 .orElseThrow(() -> new RuntimeException("Vendor isn't registered"));
         if(BCrypt.checkpw(changePasswordRequest.getOldPassword(), verifiedVendor.getPassword()))
             verifiedVendor.setPassword(changePasswordRequest.getNewPassword());
         vendorRepository.save(verifiedVendor);
-        return new Response("Your password has been successfully changed");
+        return new StoreResponse("Your password has been successfully changed");
     }
 
     @Override
-    public Response updateVendor(Integer id, UpdateRequest updateRequest) {
+    public StoreResponse updateVendor(Integer id, UpdateRequest updateRequest) {
         var findVendor = vendorRepository.findById(id);
                 if(findVendor.isEmpty()) throw new RuntimeException("Vendor not found");
         Vendor foundVendor = updatingVendor(updateRequest, findVendor);
         updatingVendor2(updateRequest, foundVendor);
         vendorRepository.save(foundVendor);
-        return new Response("Vendor has been updated");
+        return new StoreResponse("Vendor has been updated");
     }
 
     private Vendor updatingVendor(UpdateRequest updateRequest, Optional<Vendor> findVendor) {
@@ -217,7 +217,7 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
-    public Response deleteVendor(Integer id, DeleteRequest deleteRequest) {
+    public StoreResponse deleteVendor(Integer id, DeleteRequest deleteRequest) {
         Vendor foundVendor = vendorRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Vendor doesn't exist"));
 //        String deleteToken = UUID.randomUUID().toString();
@@ -225,14 +225,14 @@ public class VendorServiceImpl implements VendorService {
             String deleteVendor = "Deleted" + " + " + foundVendor.getEmail();
             foundVendor.setEmail(deleteVendor);
             vendorRepository.save(foundVendor);
-            return new Response("Vendor deleted");
+            return new StoreResponse("Vendor deleted");
         } else {
             throw new RuntimeException("Vendor can't be deleted");
         }
     }
 
     @Override
-    public Response addProduct(int id, AddProductRequest addProductRequest) {
+    public StoreResponse addProduct(int id, AddProductRequest addProductRequest) {
         Vendor savedVendor = vendorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
         Product product = new Product();
@@ -244,6 +244,6 @@ public class VendorServiceImpl implements VendorService {
         productRepository.save(product);
 //        productService.createProduct(addProductRequest);
 
-        return new Response("Product has been added successfully");
+        return new StoreResponse("Product has been added successfully");
     }
 }
