@@ -24,7 +24,7 @@ class VendorServiceImplTest {
     void testThatVendorCanRegister() {
         CreateVendorRequest createVendorRequest = new CreateVendorRequest();
         createVendorRequest.setStoreName("Perry Technologies");
-        createVendorRequest.setEmailAddress("helloworld@gmail.com");
+        createVendorRequest.setEmailAddress("mrjesus3003@gmail.com");
         createVendorRequest.setPassword("Iamnotalone#12");
         String answer = vendorService.register(createVendorRequest);
         assertEquals("Token successfully sent to your email. Please check.", answer);
@@ -33,8 +33,8 @@ class VendorServiceImplTest {
     @Test
     void testThatVendorAccountHasBeenCreated() {
         VerifyOtpRequest verifyOtpRequest = new VerifyOtpRequest();
-        verifyOtpRequest.setToken("9537");
-        verifyOtpRequest.setEmail("helloworld@gmail.com");
+        verifyOtpRequest.setToken("1058");
+        verifyOtpRequest.setEmail("mrjesus3003@gmail.com");
         CreateVendorResponse vendorResponse =
                 vendorService.createAccount(verifyOtpRequest);
         assertEquals("Successfully registered", vendorResponse.getMessage());
@@ -104,10 +104,10 @@ class VendorServiceImplTest {
     @Test
     void testThatVendorCanAddProduct() {
         AddProductRequest productRequest = new AddProductRequest();
-        productRequest.setName("LG 55inch LED Television");
-        productRequest.setPrice(BigDecimal.valueOf(149000));
-        productRequest.setProductQuantity(5);
-        productRequest.setCategory(ProductCategory.GROCERIES);
+        productRequest.setName("MacBook Pro");
+        productRequest.setPrice(460000.00);
+        productRequest.setProductQuantity(10);
+        productRequest.setCategory(ProductCategory.COMPUTING);
         StoreResponse response = vendorService.addProduct(1, productRequest);
         assertEquals("Product has been added successfully", response.getMessage());
     }

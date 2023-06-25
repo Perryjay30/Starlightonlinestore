@@ -21,10 +21,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public AddProductResponse createProduct(AddProductRequest addProductRequest) {
         Product product = new Product();
-        product.setPrice(addProductRequest.getPrice());
+        product.setUnitPrice(addProductRequest.getPrice());
         product.setCategory(ProductCategory.valueOf(String.valueOf(addProductRequest
                 .getCategory())));
-        product.setName(addProductRequest.getName());
+        product.setProductName(addProductRequest.getName());
         product.setQuantity(addProductRequest.getProductQuantity());
         Product savedProduct = productRepository.save(product);
 
@@ -63,12 +63,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private void updatingProduct2(ProductUpdateRequest productUpdateRequest, Product replaceProduct) {
-        replaceProduct.setName(productUpdateRequest.getName() != null && !productUpdateRequest.getName().equals("")
-                ? productUpdateRequest.getName() : replaceProduct.getName());
+        replaceProduct.setProductName(productUpdateRequest.getName() != null && !productUpdateRequest.getName().equals("")
+                ? productUpdateRequest.getName() : replaceProduct.getProductName());
         replaceProduct.setQuantity(productUpdateRequest.getQuantity() != 0
                 ? productUpdateRequest.getQuantity() : replaceProduct.getQuantity());
-        replaceProduct.setPrice(productUpdateRequest.getPrice() != null ?
-                productUpdateRequest.getPrice() : replaceProduct.getPrice());
+        replaceProduct.setUnitPrice(productUpdateRequest.getUnitPrice() != null ?
+                productUpdateRequest.getUnitPrice() : replaceProduct.getUnitPrice());
     }
 
     @Override

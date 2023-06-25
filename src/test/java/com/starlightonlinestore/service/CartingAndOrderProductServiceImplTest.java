@@ -19,17 +19,15 @@ class CartingAndOrderProductServiceImplTest {
     @Test
     void testThatCustomerCanAddProductToCart() {
         AddToCartRequest addToCartRequest= new AddToCartRequest();
-        addToCartRequest.setQuantity(10);
-        addToCartRequest.setProductName("Dell Laptop");
-        addToCartRequest.setProductCategory(ProductCategory.COMPUTING);
-        addToCartRequest.setPrice(166000.00);
+        addToCartRequest.setProductId(1);
+        addToCartRequest.setQuantity(5);
         StoreResponse productToCartResponse = cartingAndOrderProductService.addProductToCart(1, addToCartRequest);
         assertEquals("Product successfully added to cart", productToCartResponse.getMessage());
     }
 
     @Test
     void testThatCustomerCanRemoveProductFromCart() {
-        StoreResponse storeResponse = cartingAndOrderProductService.removeProductFromCart(1, 1);
+        StoreResponse storeResponse = cartingAndOrderProductService.removeProductFromCart(1, 102);
         assertEquals("Product has been removed from cart", storeResponse.getMessage());
     }
 

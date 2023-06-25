@@ -71,7 +71,7 @@ public class EmailServiceImpl implements EmailService {
         messageHelper.setFrom("pelumijsh@gmail.com");
         messageHelper.setTo(recipientEmail);
         String subject = "Successful Order";
-        String content = "<p>Hello" + name + ",</p>"
+        String content = "<p>Hello " + name + ",</p>"
                 + "<p>You have successfully placed an order. Your goods will be delivered to you within " +
                 "3 - 4 business working days</p>"
                 + "<p>Here is your orderId</p>" + orderId

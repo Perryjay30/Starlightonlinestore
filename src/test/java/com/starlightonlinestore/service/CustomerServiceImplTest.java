@@ -34,7 +34,7 @@ public class CustomerServiceImplTest {
     @Test
     void testThatCustomerAccountHasBeenCreated() {
         VerifyOtpRequest verifyOtpRequest = new VerifyOtpRequest();
-        verifyOtpRequest.setToken("0661");
+        verifyOtpRequest.setToken("3501");
         verifyOtpRequest.setEmail("adebolexsewa@gmail.com");
         CustomerRegistrationResponse registrationResponse =
                 customerService.createAccount(verifyOtpRequest);

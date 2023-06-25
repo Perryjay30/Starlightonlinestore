@@ -13,7 +13,7 @@ public class AddProductRequest {
     @NotBlank(message = "This field is required")
     private String name;
     @NotBlank(message = "This field is required")
-    private BigDecimal price;
+    private Double price;
     @NotBlank(message = "This field is required")
     private ProductCategory category;
     @NotBlank(message = "This field is required")

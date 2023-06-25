@@ -5,8 +5,6 @@ import lombok.Data;
 
 @Data
 public class AddToCartRequest {
-    private String productName;
-    private ProductCategory productCategory;
-    private double price;
+    private Integer productId;
     private int quantity;
 }

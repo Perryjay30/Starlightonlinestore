@@ -30,14 +30,14 @@ public class ProductServiceImplTest {
         addProductRequest = new AddProductRequest();
 
         addProductRequest.setName("Versace, Turtle-neck");
-        addProductRequest.setPrice(BigDecimal.valueOf(15000.00));
+        addProductRequest.setPrice(15000.00);
         addProductRequest.setCategory
                 (ProductCategory.FASHION);
         addProductRequest.setProductQuantity(32);
 
         addSecondProductRequest = new AddProductRequest();
         addSecondProductRequest.setName("Bag Of Rice");
-        addSecondProductRequest.setPrice(BigDecimal.valueOf(45000.00));
+        addSecondProductRequest.setPrice(45000.00);
         addSecondProductRequest.setCategory
                 (GROCERIES);
         addSecondProductRequest.setProductQuantity(21);
@@ -59,7 +59,7 @@ public class ProductServiceImplTest {
         ProductUpdateRequest productUpdateRequest = new ProductUpdateRequest();
         productUpdateRequest.setCategory(ProductCategory.APPLIANCES);
         productUpdateRequest.setName("Standing Fan");
-        productUpdateRequest.setPrice(BigDecimal.valueOf(24000.00));
+        productUpdateRequest.setUnitPrice(24000.00);
         productUpdateRequest.setQuantity(20);
         StoreResponse response = productService.updateProduct(352, productUpdateRequest);
         System.out.println(response);

@@ -9,6 +9,7 @@ import com.starlightonlinestore.data.models.*;
 import com.starlightonlinestore.data.repository.CartRepository;
 import com.starlightonlinestore.data.repository.CustomerOrderRepository;
 import com.starlightonlinestore.data.repository.CustomerRepository;
+import com.starlightonlinestore.data.repository.ProductRepository;
 import com.starlightonlinestore.utils.validators.EmailService;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +29,8 @@ public class CartingAndOrderProductServiceImpl implements CartingAndOrderProduct
     private final CartRepository cartRepository;
     private final PaymentService paymentService;
     private final EmailService emailService;
-
     private final CustomerServiceImpl customerService;
+    private final ProductRepository productRepository;
 
     @Override
     public StoreResponse addProductToCart(Integer id, AddToCartRequest addToCartRequest) {
@@ -52,23 +53,20 @@ public class CartingAndOrderProductServiceImpl implements CartingAndOrderProduct
     public List<Cart> getAllCart() {
         return cartRepository.findAll();
     }
-//        if(product.getQuantity() >= orderProductRequest.getQuantity()) {
-
-
-//        }
-//        else
-//            throw new RuntimeException("order quantity larger than available quantity");
-
-
-
-//            customerRepository.save(customer);
 
     private Cart AddingItemsToCart(AddToCartRequest addToCartRequest) {
+        Product availableProduct = productRepository.findById(addToCartRequest.getProductId())
+                .orElseThrow(() -> new StoreException("Product isn't available"));
         Cart newCart = new Cart();
-        newCart.setProductName(addToCartRequest.getProductName());
-        newCart.setProductCategory(addToCartRequest.getProductCategory());
-        newCart.setPrice(addToCartRequest.getPrice());
-        newCart.setQuantity(addToCartRequest.getQuantity());
+        newCart.setProductName(availableProduct.getProductName());
+        newCart.setProductCategory(availableProduct.getCategory());
+        newCart.setUnitPrice(availableProduct.getUnitPrice());
+        if(availableProduct.getQuantity() >= addToCartRequest.getQuantity()) {
+            newCart.setQuantity(addToCartRequest.getQuantity());
+        } else {
+            throw new StoreException("order quantity larger than available quantity");
+        }
+        newCart.setTotalPrice(availableProduct.getUnitPrice() * addToCartRequest.getQuantity());
         newCart.setLocalDateTime(LocalDateTime.now());
 //        order.setTotal(order.getPrice() * order.getQuantity());
         return newCart;
@@ -128,7 +126,7 @@ public class CartingAndOrderProductServiceImpl implements CartingAndOrderProduct
         List<Cart> allCart = getAllCart();
         double total = 0;
         for (Cart amountCart : allCart) {
-            if(amountCart.getPrice() > 0) totalAmountCart.add(amountCart.getPrice());
+            if(amountCart.getTotalPrice() > 0) totalAmountCart.add(amountCart.getTotalPrice());
         }
         for(int j = 0; j < totalAmountCart.size(); j++) {
             total += totalAmountCart.get(j);
