@@ -2,11 +2,7 @@ package com.starlightonlinestore.service;
 
 import com.starlightonlinestore.data.dto.Request.*;
 import com.starlightonlinestore.data.dto.Response.*;
-import com.starlightonlinestore.data.models.CustomerOrder;
 import jakarta.mail.MessagingException;
-
-import java.io.IOException;
-import java.util.List;
 
 
 public interface CustomerService {
@@ -27,7 +23,7 @@ public interface CustomerService {
 
     StoreResponse deleteCustomer(int id, DeleteRequest deleteRequest);
 
-    StoreResponse changePassword(ChangePasswordRequest changePasswordRequest);
+    StoreResponse changePassword(String email, ChangePasswordRequest changePasswordRequest);
 
-    StoreResponse updateCustomer(Integer id, UpdateRequest updateRequest);
+    StoreResponse updateCustomer(Integer id, EditCustomerProfileRequest editCustomerProfileRequest);
 }

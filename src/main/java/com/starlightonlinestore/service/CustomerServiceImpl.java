@@ -89,6 +89,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public StoreResponse resetPassword(String email, ResetPasswordRequest resetPasswordRequest) {
         VerifyOtpRequest verifyOtpRequest = new VerifyOtpRequest();
+        verifyOtpRequest.setToken(resetPasswordRequest.getToken());
         verifyOTP(verifyOtpRequest);
         Customer foundCustomer = customerRepository.findByEmail(email).get();
         foundCustomer.setPassword(resetPasswordRequest.getPassword());
@@ -158,8 +159,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public StoreResponse changePassword(ChangePasswordRequest changePasswordRequest) {
-        Customer verifiedCustomer = getFoundCustomer(customerRepository.findByEmail(changePasswordRequest.getEmail()), "customer isn't registered");
+    public StoreResponse changePassword(String email, ChangePasswordRequest changePasswordRequest) {
+        Customer verifiedCustomer = getFoundCustomer(customerRepository.findByEmail(email), "customer isn't registered");
         if(BCrypt.checkpw(changePasswordRequest.getOldPassword(), verifiedCustomer.getPassword()))
             verifiedCustomer.setPassword(changePasswordRequest.getNewPassword());
         customerRepository.save(verifiedCustomer);
@@ -187,31 +188,31 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public StoreResponse updateCustomer(Integer id, UpdateRequest updateRequest) {
+    public StoreResponse updateCustomer(Integer id, EditCustomerProfileRequest editCustomerProfileRequest) {
         var customer = customerRepository.findById(id);
         if (customer.isEmpty()) throw new RuntimeException("customer not found");
-        Customer foundCustomer = updatingTheCustomer(updateRequest, customer);
+        Customer foundCustomer = updatingTheCustomer(editCustomerProfileRequest, customer);
         customerRepository.save(foundCustomer);
         return new StoreResponse("Customer updated successfully");
     }
 
-    private Customer updatingTheCustomer(UpdateRequest updateRequest, Optional<Customer> customer) {
+    private Customer updatingTheCustomer(EditCustomerProfileRequest editCustomerProfileRequest, Optional<Customer> customer) {
         var foundCustomer = customer.get();
-        foundCustomer.setFirstName(updateRequest.getFirstName());
-        if(customerRepository.findByPhoneNumber(updateRequest.getPhone()).isPresent())
+        foundCustomer.setFirstName(editCustomerProfileRequest.getFirstName());
+        if(customerRepository.findByPhoneNumber(editCustomerProfileRequest.getPhone()).isPresent())
             throw new RuntimeException("This Phone Number has been taken, kindly register with another");
         else
-            foundCustomer.setPhoneNumber(updateRequest.getPhone()!= null && !updateRequest.getPhone()
-                .equals("") ? updateRequest.getPhone() : foundCustomer.getPhoneNumber());
-        return stillUpdatingCustomer(updateRequest, foundCustomer);
+            foundCustomer.setPhoneNumber(editCustomerProfileRequest.getPhone()!= null && !editCustomerProfileRequest.getPhone()
+                .equals("") ? editCustomerProfileRequest.getPhone() : foundCustomer.getPhoneNumber());
+        return stillUpdatingCustomer(editCustomerProfileRequest, foundCustomer);
     }
 
-    private Customer stillUpdatingCustomer(UpdateRequest updateRequest, Customer foundCustomer) {
-        foundCustomer.setLastName(updateRequest.getLastName());
+    private Customer stillUpdatingCustomer(EditCustomerProfileRequest editCustomerProfileRequest, Customer foundCustomer) {
+        foundCustomer.setLastName(editCustomerProfileRequest.getLastName());
         Set<String> buyersAddressList = foundCustomer.getDeliveryAddress();
-        buyersAddressList.add(updateRequest.getDeliveryAddress());
-        foundCustomer.setEmail(updateRequest.getEmail() != null && !updateRequest.getEmail()
-                .equals("") ? updateRequest.getEmail() : foundCustomer.getEmail());
+        buyersAddressList.add(editCustomerProfileRequest.getDeliveryAddress());
+        foundCustomer.setEmail(editCustomerProfileRequest.getEmail() != null && !editCustomerProfileRequest.getEmail()
+                .equals("") ? editCustomerProfileRequest.getEmail() : foundCustomer.getEmail());
         return foundCustomer;
     }
 }

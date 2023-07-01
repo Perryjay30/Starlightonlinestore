@@ -18,10 +18,10 @@ StoreResponse resetPassword(String email, ResetPasswordRequest resetPasswordRequ
 
 String sendOTP(SendOtpRequest sendOtpRequest);
 LoginResponse login(LoginRequest loginRequest);
-StoreResponse updateVendor(Integer id, UpdateRequest updateRequest);
+StoreResponse updateVendor(Integer id, UpdateVendorRequest updateVendorRequest);
 
 StoreResponse deleteVendor(Integer id, DeleteRequest deleteRequest);
-StoreResponse changePassword(ChangePasswordRequest changePasswordRequest);
+StoreResponse changePassword(String email, ChangePasswordRequest changePasswordRequest);
 
 StoreResponse addProduct(int id, AddProductRequest addProductRequest);
 

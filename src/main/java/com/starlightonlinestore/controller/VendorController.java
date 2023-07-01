@@ -43,9 +43,9 @@ public class VendorController {
         return ResponseEntity.ok(vendorService.resetPassword(email, resetPasswordRequest));
     }
 
-    @PostMapping("/changePassword")
-    public ResponseEntity<?> changePassword(ChangePasswordRequest changePasswordRequest) {
-        return ResponseEntity.ok(vendorService.changePassword(changePasswordRequest));
+    @PostMapping("/changePassword/{email}")
+    public ResponseEntity<?> changePassword(@PathVariable String email, ChangePasswordRequest changePasswordRequest) {
+        return ResponseEntity.ok(vendorService.changePassword(email, changePasswordRequest));
     }
 
     @DeleteMapping("/{id}")
@@ -55,8 +55,8 @@ public class VendorController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateCustomer(@Valid @RequestBody @PathVariable int id, UpdateRequest updateRequest) {
-        return ResponseEntity.ok(vendorService.updateVendor(id, updateRequest));
+    public ResponseEntity<?> updateCustomer(@Valid @RequestBody @PathVariable int id, UpdateVendorRequest updateVendorRequest) {
+        return ResponseEntity.ok(vendorService.updateVendor(id, updateVendorRequest));
     }
 
     @PostMapping("/addProduct/{id}")

@@ -47,9 +47,9 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.resetPassword(email, resetPasswordRequest));
     }
 
-    @PostMapping("/changePassword")
-    public ResponseEntity<?> changePassword(ChangePasswordRequest changePasswordRequest) {
-        return ResponseEntity.ok(customerService.changePassword(changePasswordRequest));
+    @PostMapping("/changePassword/{email}")
+    public ResponseEntity<?> changePassword(@PathVariable String email, ChangePasswordRequest changePasswordRequest) {
+        return ResponseEntity.ok(customerService.changePassword(email, changePasswordRequest));
     }
 
     @DeleteMapping("/{id}")
@@ -58,9 +58,9 @@ public class CustomerController {
       return ResponseEntity.ok(customerService.deleteCustomer(id, deleteRequest));
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<?> updateCustomer(@Valid @RequestBody @PathVariable int id, UpdateRequest updateRequest) {
-       return ResponseEntity.ok(customerService.updateCustomer(id, updateRequest));
+    @PatchMapping("/updateProfile/{id}")
+    public ResponseEntity<?> updateCustomer(@Valid @RequestBody @PathVariable int id, EditCustomerProfileRequest editCustomerProfileRequest) {
+       return ResponseEntity.ok(customerService.updateCustomer(id, editCustomerProfileRequest));
     }
 
 }

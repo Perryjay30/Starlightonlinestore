@@ -176,8 +176,8 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
-    public StoreResponse changePassword(ChangePasswordRequest changePasswordRequest) {
-        Vendor verifiedVendor = vendorRepository.findByEmail(changePasswordRequest.getEmail())
+    public StoreResponse changePassword(String email, ChangePasswordRequest changePasswordRequest) {
+        Vendor verifiedVendor = vendorRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Vendor isn't registered"));
         if(BCrypt.checkpw(changePasswordRequest.getOldPassword(), verifiedVendor.getPassword()))
             verifiedVendor.setPassword(changePasswordRequest.getNewPassword());
@@ -186,34 +186,34 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
-    public StoreResponse updateVendor(Integer id, UpdateRequest updateRequest) {
+    public StoreResponse updateVendor(Integer id, UpdateVendorRequest updateVendorRequest) {
         var findVendor = vendorRepository.findById(id);
                 if(findVendor.isEmpty()) throw new RuntimeException("Vendor not found");
-        Vendor foundVendor = updatingVendor(updateRequest, findVendor);
-        updatingVendor2(updateRequest, foundVendor);
+        Vendor foundVendor = updatingVendor(updateVendorRequest, findVendor);
+        updatingVendor2(updateVendorRequest, foundVendor);
         vendorRepository.save(foundVendor);
         return new StoreResponse("Vendor has been updated");
     }
 
-    private Vendor updatingVendor(UpdateRequest updateRequest, Optional<Vendor> findVendor) {
+    private Vendor updatingVendor(UpdateVendorRequest updateVendorRequest, Optional<Vendor> findVendor) {
         var foundVendor = findVendor.get();
-        if(vendorRepository.findByPhoneNumber(updateRequest.getPhone()).isPresent())
+        if(vendorRepository.findByPhoneNumber(updateVendorRequest.getPhone()).isPresent())
             throw new RuntimeException("This Phone Number has been taken, kindly provide with another");
         else
-            foundVendor.setPhoneNumber(updateRequest.getPhone()!= null && !updateRequest.getPhone()
-                    .equals("") ? updateRequest.getPhone() : foundVendor.getPhoneNumber());
-        foundVendor.setStoreName(updateRequest.getStoreName() != null && !updateRequest.getStoreName()
-                .equals("") ? updateRequest.getStoreName() : foundVendor.getStoreName());
+            foundVendor.setPhoneNumber(updateVendorRequest.getPhone()!= null && !updateVendorRequest.getPhone()
+                    .equals("") ? updateVendorRequest.getPhone() : foundVendor.getPhoneNumber());
+        foundVendor.setStoreName(updateVendorRequest.getStoreName() != null && !updateVendorRequest.getStoreName()
+                .equals("") ? updateVendorRequest.getStoreName() : foundVendor.getStoreName());
         return foundVendor;
     }
 
 
-    private void updatingVendor2(UpdateRequest updateRequest, Vendor foundVendor) {
-        foundVendor.setEmail(updateRequest.getEmail() != null && !updateRequest.getEmail()
-                .equals("") ? updateRequest.getEmail() : foundVendor.getEmail());
+    private void updatingVendor2(UpdateVendorRequest updateVendorRequest, Vendor foundVendor) {
+        foundVendor.setEmail(updateVendorRequest.getEmail() != null && !updateVendorRequest.getEmail()
+                .equals("") ? updateVendorRequest.getEmail() : foundVendor.getEmail());
         Set<String> vendorStoreAddress = foundVendor.getStoreAddress();
-        vendorStoreAddress.add(updateRequest.getStoreAddress() != null && !updateRequest.getStoreAddress()
-                .equals("") ? updateRequest.getStoreAddress() : String.valueOf(vendorStoreAddress));
+        vendorStoreAddress.add(updateVendorRequest.getStoreAddress() != null && !updateVendorRequest.getStoreAddress()
+                .equals("") ? updateVendorRequest.getStoreAddress() : String.valueOf(vendorStoreAddress));
     }
 
     @Override

@@ -7,8 +7,8 @@ import org.mindrot.jbcrypt.BCrypt;
 
 @Data
 public class ChangePasswordRequest {
-    @NotBlank(message = "This field must not be empty")
-    private String email;
+//    @NotBlank(message = "This field must not be empty")
+//    private String email;
     @NotBlank(message = "This field must not be empty")
     private String oldPassword;
     @NotBlank(message = "This field must not be empty")

@@ -1,6 +1,5 @@
 package com.starlightonlinestore.service;
 
-import com.starlightonlinestore.data.models.ProductCategory;
 import com.starlightonlinestore.data.dto.Request.*;
 import com.starlightonlinestore.data.dto.Response.*;
 import jakarta.mail.MessagingException;
@@ -53,10 +52,10 @@ public class CustomerServiceImplTest {
     @Test
     void testThatCustomerCanChangePassword() {
         ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest();
-        changePasswordRequest.setEmail("chidioke56@email.com");
+//        changePasswordRequest.setEmail("chidioke56@email.com");
         changePasswordRequest.setOldPassword("Tomisin97#");
         changePasswordRequest.setNewPassword("ChangePass!28");
-        StoreResponse resp = customerService.changePassword(changePasswordRequest);
+        StoreResponse resp = customerService.changePassword("", changePasswordRequest);
         assertEquals("Your password has been successfully changed", resp.getMessage());
     }
 
@@ -71,25 +70,25 @@ public class CustomerServiceImplTest {
     @Test
     void testThatPasswordCanBeResetAfterForgotten() {
         ResetPasswordRequest resetPasswordRequest = new ResetPasswordRequest();
-        resetPasswordRequest.setToken("6561");
+        resetPasswordRequest.setToken("5971");
 //        resetPasswordRequest.setEmail("mrjesus@email.com");
-        resetPasswordRequest.setPassword("Nightingale@90");
-        resetPasswordRequest.setConfirmPassword("Nightingale@90");
-        StoreResponse answer = customerService.resetPassword("mrjesus@email.com", resetPasswordRequest);
+        resetPasswordRequest.setPassword("Washington@11");
+        resetPasswordRequest.setConfirmPassword("Washington@11");
+        StoreResponse answer = customerService.resetPassword("o.taiwo@native.semicolon.africa", resetPasswordRequest);
         assertEquals("Your password has been reset successfully", answer.getMessage());
     }
 
 
     @Test
     void testThatCustomerCanBeUpdated() {
-        UpdateRequest updateCustomer = new UpdateRequest();
-        updateCustomer.setEmail("Emailisupdated@gmail.com");
-        updateCustomer.setFirstName("Hakimi");
-        updateCustomer.setLastName("Davies");
-        updateCustomer.setPhone( "07035893966");
-        updateCustomer.setPassword("Englandmoro678#");
+        EditCustomerProfileRequest editCustomerProfileRequest = new EditCustomerProfileRequest();
+        editCustomerProfileRequest.setEmail("Emailisupdated@gmail.com");
+        editCustomerProfileRequest.setFirstName("Hakimi");
+        editCustomerProfileRequest.setLastName("Davies");
+        editCustomerProfileRequest.setPhone( "07035893966");
+//        updateCustomer.setPassword("Englandmoro678#");
         StoreResponse updateCustomerResponse =
-                customerService.updateCustomer(1, updateCustomer);
+                customerService.updateCustomer(1, editCustomerProfileRequest);
         System.out.println(updateCustomerResponse);
         assertEquals("Customer updated successfully", updateCustomerResponse.getMessage());
     }

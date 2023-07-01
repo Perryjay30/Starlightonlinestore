@@ -10,8 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.math.BigDecimal;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -53,10 +51,10 @@ class VendorServiceImplTest {
     @Test
     void testThatVendorCanChangePassword() {
         ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest();
-        changePasswordRequest.setEmail("helloworld@gmail.com");
+//        changePasswordRequest.setEmail("helloworld@gmail.com");
         changePasswordRequest.setOldPassword("Iamnotalone#12");
         changePasswordRequest.setNewPassword("ChangePass!28");
-        StoreResponse resp = vendorService.changePassword(changePasswordRequest);
+        StoreResponse resp = vendorService.changePassword("", changePasswordRequest);
         assertEquals("Your password has been successfully changed", resp.getMessage());
     }
 
@@ -82,7 +80,7 @@ class VendorServiceImplTest {
 
     @Test
     void updateVendor() {
-        UpdateRequest requestUpdate = new UpdateRequest();
+        UpdateVendorRequest requestUpdate = new UpdateVendorRequest();
         requestUpdate.setPhone("09161931557");
         requestUpdate.setEmail("daredevil@yahoo.com");
         requestUpdate.setStoreAddress("312 Portland region, Oregon");
