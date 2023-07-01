@@ -1,9 +1,7 @@
 package com.starlightonlinestore.controller;
 
 import com.starlightonlinestore.data.dto.Request.*;
-import com.starlightonlinestore.data.dto.Response.PaymentResponse;
 import com.starlightonlinestore.service.CustomerService;
-import com.starlightonlinestore.service.PaymentService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/customer")
@@ -29,9 +26,9 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.register(customerRegistrationRequest));
     }
 
-    @PostMapping("/createAccount")
-    public ResponseEntity<?> createAccount(@Valid @RequestBody VerifyOtpRequest verifyOtpRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(customerService.createAccount(verifyOtpRequest));
+    @PostMapping("/createAccount/{email}")
+    public ResponseEntity<?> createAccount(@PathVariable String email, @Valid @RequestBody VerifyOtpRequest verifyOtpRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(customerService.createAccount(email, verifyOtpRequest));
     }
 
 
@@ -45,9 +42,9 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.forgotPassword(forgotPasswordRequest));
     }
 
-    @PostMapping("/resetPassword")
-    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
-        return ResponseEntity.ok(customerService.resetPassword(resetPasswordRequest));
+    @PostMapping("/resetPassword/{email}")
+    public ResponseEntity<?> resetPassword(@PathVariable String email, @Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
+        return ResponseEntity.ok(customerService.resetPassword(email, resetPasswordRequest));
     }
 
     @PostMapping("/changePassword")

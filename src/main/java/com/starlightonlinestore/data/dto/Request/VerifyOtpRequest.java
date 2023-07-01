@@ -7,6 +7,6 @@ import lombok.Data;
 public class VerifyOtpRequest {
     @NotBlank(message = "This field must not be empty")
     private String token;
-    @NotBlank(message = "This field must not be empty")
-    private String email;
+//    @NotBlank(message = "This field must not be empty")
+//    private String email;
 }

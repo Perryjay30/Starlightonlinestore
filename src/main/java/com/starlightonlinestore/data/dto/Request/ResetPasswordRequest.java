@@ -7,8 +7,8 @@ import org.mindrot.jbcrypt.BCrypt;
 
 @Data
 public class ResetPasswordRequest {
-    @NotBlank(message = "This field must not be empty")
-    private String email;
+//    @NotBlank(message = "This field must not be empty")
+//    private String email;
 
     @NotBlank(message = "This field must not be empty")
     private String token;

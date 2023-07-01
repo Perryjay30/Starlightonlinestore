@@ -100,9 +100,9 @@ public class VendorServiceImpl implements VendorService {
 
 
     @Override
-    public CreateVendorResponse createAccount(VerifyOtpRequest verifyOtpRequest) {
+    public CreateVendorResponse createAccount(String email, VerifyOtpRequest verifyOtpRequest) {
         verifyOTP(verifyOtpRequest);
-        var savedVendor = vendorRepository.findByEmail(verifyOtpRequest.getEmail())
+        var savedVendor = vendorRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Vendor does not exists"));
         vendorRepository.enableVendor(VERIFIED, savedVendor.getEmail());
         return registeredVendorResponse(savedVendor);
@@ -137,9 +137,9 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
-    public StoreResponse resetPassword(ResetPasswordRequest resetPasswordRequest) {
+    public StoreResponse resetPassword(String email, ResetPasswordRequest resetPasswordRequest) {
         OtpVerificationForResetPassword(resetPasswordRequest);
-        Vendor lostVendor = vendorRepository.findByEmail(resetPasswordRequest.getEmail()).get();
+        Vendor lostVendor = vendorRepository.findByEmail(email).get();
         lostVendor.setPassword(resetPasswordRequest.getPassword());
         if(BCrypt.checkpw(resetPasswordRequest.getConfirmPassword(), resetPasswordRequest.getPassword())) {
             vendorRepository.save(lostVendor);

@@ -45,12 +45,12 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerRegistrationResponse createAccount(VerifyOtpRequest verifyOtpRequest) {
-        log.info(verifyOtpRequest.getEmail());
-        log.info(verifyOtpRequest.getToken());
+    public CustomerRegistrationResponse createAccount(String email, VerifyOtpRequest verifyOtpRequest) {
+//        log.info(verifyOtpRequest.getEmail());
+//        log.info(verifyOtpRequest.getToken());
         verifyOTP(verifyOtpRequest);
         var savedCustomer =
-                getFoundCustomer(customerRepository.findByEmail(verifyOtpRequest.getEmail()), "Customer does not exists");
+                getFoundCustomer(customerRepository.findByEmail(email), "Customer does not exists");
 //        savedCustomer.setStatus(VERIFIED);
 //        customerRepository.save(savedCustomer);
         customerRepository.enableCustomer(VERIFIED, savedCustomer.getEmail());
@@ -87,9 +87,10 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public StoreResponse resetPassword(ResetPasswordRequest resetPasswordRequest) {
-        verifyOtpForResetPassword(resetPasswordRequest);
-        Customer foundCustomer = customerRepository.findByEmail(resetPasswordRequest.getEmail()).get();
+    public StoreResponse resetPassword(String email, ResetPasswordRequest resetPasswordRequest) {
+        VerifyOtpRequest verifyOtpRequest = new VerifyOtpRequest();
+        verifyOTP(verifyOtpRequest);
+        Customer foundCustomer = customerRepository.findByEmail(email).get();
         foundCustomer.setPassword(resetPasswordRequest.getPassword());
         if(BCrypt.checkpw(resetPasswordRequest.getConfirmPassword(), resetPasswordRequest.getPassword())) {
             customerRepository.save(foundCustomer);
@@ -99,17 +100,10 @@ public class CustomerServiceImpl implements CustomerService {
         }
     }
 
-    private void verifyOtpForResetPassword(ResetPasswordRequest resetPasswordRequest) {
-        var foundToken = otpTokenRepository.findByToken(resetPasswordRequest.getToken())
-                .orElseThrow(() -> new RuntimeException("Token doesn't exist"));
-        if(foundToken.getVerifiedAt() != null)
-            throw new RuntimeException("Token has been used");
-        if(foundToken.getExpiredAt().isBefore(LocalDateTime.now()))
-            throw new RuntimeException("Token has expired");
-        if(!Objects.equals(resetPasswordRequest.getToken(), foundToken.getToken()))
-            throw new RuntimeException("Incorrect token");
-        otpTokenRepository.setVerifiedAt(LocalDateTime.now(), resetPasswordRequest.getToken());
-    }
+//    private void verifyOtpForResetPassword(ResetPasswordRequest resetPasswordRequest) {
+//        VerifyOtpRequest verifyOtpRequest = new VerifyOtpRequest();
+//        verifyOTP(verifyOtpRequest);
+//    }
 
     @Override
     public String sendOTP(SendOtpRequest sendOtpRequest) {

@@ -12,15 +12,16 @@ import java.util.List;
 public interface CustomerService {
     String register(CustomerRegistrationRequest customerRegistrationRequest);
 
-    CustomerRegistrationResponse createAccount(VerifyOtpRequest verifyOtpRequest);
+    CustomerRegistrationResponse createAccount(String email, VerifyOtpRequest verifyOtpRequest);
 
     void verifyOTP(VerifyOtpRequest verifyOtpRequest);
 
     String forgotPassword(ForgotPasswordRequest forgotPasswordRequest) throws MessagingException;
 
-    StoreResponse resetPassword(ResetPasswordRequest resetPasswordRequest);
+    StoreResponse resetPassword(String email, ResetPasswordRequest resetPasswordRequest);
 
     String sendOTP(SendOtpRequest sendOtpRequest);
+
 
     LoginResponse login(LoginRequest loginRequest);
 

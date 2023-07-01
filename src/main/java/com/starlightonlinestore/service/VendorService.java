@@ -8,13 +8,13 @@ import jakarta.mail.MessagingException;
 
 public interface VendorService {
 String register(CreateVendorRequest createVendorRequest);
-CreateVendorResponse createAccount(VerifyOtpRequest verifyOtpRequest);
+CreateVendorResponse createAccount(String email, VerifyOtpRequest verifyOtpRequest);
 
 void verifyOTP(VerifyOtpRequest verifyOtpRequest);
 
 String forgotPassword(ForgotPasswordRequest forgotPasswordRequest) throws MessagingException;
 
-StoreResponse resetPassword(ResetPasswordRequest resetPasswordRequest);
+StoreResponse resetPassword(String email, ResetPasswordRequest resetPasswordRequest);
 
 String sendOTP(SendOtpRequest sendOtpRequest);
 LoginResponse login(LoginRequest loginRequest);

@@ -34,9 +34,9 @@ class VendorServiceImplTest {
     void testThatVendorAccountHasBeenCreated() {
         VerifyOtpRequest verifyOtpRequest = new VerifyOtpRequest();
         verifyOtpRequest.setToken("1058");
-        verifyOtpRequest.setEmail("mrjesus3003@gmail.com");
+//        verifyOtpRequest.setEmail("mrjesus3003@gmail.com");
         CreateVendorResponse vendorResponse =
-                vendorService.createAccount(verifyOtpRequest);
+                vendorService.createAccount("", verifyOtpRequest);
         assertEquals("Successfully registered", vendorResponse.getMessage());
     }
 
@@ -72,10 +72,10 @@ class VendorServiceImplTest {
     void testThatPasswordCanBeResetAfterForgotten() {
         ResetPasswordRequest resetPasswordRequest = new ResetPasswordRequest();
         resetPasswordRequest.setToken("3122");
-        resetPasswordRequest.setEmail("helloworld@gmail.com");
+//        resetPasswordRequest.setEmail("helloworld@gmail.com");
         resetPasswordRequest.setPassword("Nightingale@90");
         resetPasswordRequest.setConfirmPassword("Nightingale@90");
-        StoreResponse answer = vendorService.resetPassword(resetPasswordRequest);
+        StoreResponse answer = vendorService.resetPassword("", resetPasswordRequest);
         assertEquals("Your password has been reset successfully", answer.getMessage());
     }
 

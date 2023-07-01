@@ -22,9 +22,9 @@ public class CustomerServiceImplTest {
 //        firstCustomerRegisterRequest.setEmail("chidioke56@email.com");
 //        firstCustomerRegisterRequest.setPassword("Tomisin97#");
         CustomerRegistrationRequest secondCustomerRegisterRequest = new CustomerRegistrationRequest();
-        secondCustomerRegisterRequest.setFirstName("Ajoke");
-        secondCustomerRegisterRequest.setLastName("Taiwo");
-        secondCustomerRegisterRequest.setEmail("adebolexsewa@gmail.com");
+        secondCustomerRegisterRequest.setFirstName("DrinkWater");
+        secondCustomerRegisterRequest.setLastName("Danny");
+        secondCustomerRegisterRequest.setEmail("o.taiwo@native.semicolon.africa");
         secondCustomerRegisterRequest.setPassword("Dasilva19@");
         String response =
                 customerService.register(secondCustomerRegisterRequest);
@@ -35,9 +35,9 @@ public class CustomerServiceImplTest {
     void testThatCustomerAccountHasBeenCreated() {
         VerifyOtpRequest verifyOtpRequest = new VerifyOtpRequest();
         verifyOtpRequest.setToken("3501");
-        verifyOtpRequest.setEmail("adebolexsewa@gmail.com");
+//        verifyOtpRequest.setEmail("adebolexsewa@gmail.com");
         CustomerRegistrationResponse registrationResponse =
-                customerService.createAccount(verifyOtpRequest);
+                customerService.createAccount("", verifyOtpRequest);
         assertEquals("User registration successful", registrationResponse.getMessage());
     }
 
@@ -72,10 +72,10 @@ public class CustomerServiceImplTest {
     void testThatPasswordCanBeResetAfterForgotten() {
         ResetPasswordRequest resetPasswordRequest = new ResetPasswordRequest();
         resetPasswordRequest.setToken("6561");
-        resetPasswordRequest.setEmail("mrjesus@email.com");
+//        resetPasswordRequest.setEmail("mrjesus@email.com");
         resetPasswordRequest.setPassword("Nightingale@90");
         resetPasswordRequest.setConfirmPassword("Nightingale@90");
-        StoreResponse answer = customerService.resetPassword(resetPasswordRequest);
+        StoreResponse answer = customerService.resetPassword("mrjesus@email.com", resetPasswordRequest);
         assertEquals("Your password has been reset successfully", answer.getMessage());
     }
 
@@ -97,8 +97,8 @@ public class CustomerServiceImplTest {
     @Test
     void testThatCustomerCanBeDeleted() {
         DeleteRequest deleteRequest = new DeleteRequest();
-        deleteRequest.setPassword("Nightingale@90");
-        StoreResponse deleteResponse = customerService.deleteCustomer(2, deleteRequest);
+        deleteRequest.setPassword("Egunperry@57");
+        StoreResponse deleteResponse = customerService.deleteCustomer(252, deleteRequest);
         assertEquals("Customer deleted", deleteResponse.getMessage());
     }
 

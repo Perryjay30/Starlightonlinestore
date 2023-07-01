@@ -23,9 +23,9 @@ public class VendorController {
         return ResponseEntity.ok(vendorService.register(createVendorRequest));
     }
 
-    @PostMapping("/createAccount")
-    public ResponseEntity<?> createVendor(@Valid @RequestBody VerifyOtpRequest verifyOtpRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(vendorService.createAccount(verifyOtpRequest));
+    @PostMapping("/createAccount/{email}")
+    public ResponseEntity<?> createVendor(@PathVariable String email, @Valid @RequestBody VerifyOtpRequest verifyOtpRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(vendorService.createAccount(email, verifyOtpRequest));
     }
 
     @GetMapping
@@ -38,9 +38,9 @@ public class VendorController {
         return ResponseEntity.ok(vendorService.forgotPassword(forgotPasswordRequest));
     }
 
-    @PostMapping("/resetPassword")
-    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
-        return ResponseEntity.ok(vendorService.resetPassword(resetPasswordRequest));
+    @PostMapping("/resetPassword/{email}")
+    public ResponseEntity<?> resetPassword(@PathVariable String email, @Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
+        return ResponseEntity.ok(vendorService.resetPassword(email, resetPasswordRequest));
     }
 
     @PostMapping("/changePassword")
