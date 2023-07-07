@@ -102,7 +102,7 @@ class VendorServiceImplTest {
     @Test
     void testThatVendorCanAddProduct() {
         AddProductRequest productRequest = new AddProductRequest();
-        productRequest.setName("MacBook Pro");
+        productRequest.setProductName("MacBook Pro");
         productRequest.setPrice(460000.00);
         productRequest.setProductQuantity(10);
         productRequest.setCategory(ProductCategory.COMPUTING);

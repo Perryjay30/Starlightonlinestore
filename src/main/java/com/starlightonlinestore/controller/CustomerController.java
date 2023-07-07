@@ -53,13 +53,13 @@ public class CustomerController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCustomerById(@Valid @RequestBody @PathVariable int id, DeleteRequest deleteRequest) {
+    public ResponseEntity<?> deleteCustomerById(@PathVariable int id, @Valid @RequestBody DeleteRequest deleteRequest) {
         log.info("Id -> {}", id);
       return ResponseEntity.ok(customerService.deleteCustomer(id, deleteRequest));
     }
 
     @PatchMapping("/updateProfile/{id}")
-    public ResponseEntity<?> updateCustomer(@Valid @RequestBody @PathVariable int id, EditCustomerProfileRequest editCustomerProfileRequest) {
+    public ResponseEntity<?> updateCustomer(@PathVariable int id, @Valid @RequestBody EditCustomerProfileRequest editCustomerProfileRequest) {
        return ResponseEntity.ok(customerService.updateCustomer(id, editCustomerProfileRequest));
     }
 

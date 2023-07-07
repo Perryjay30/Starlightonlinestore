@@ -14,6 +14,8 @@ public class Product {
     private Integer id;
     private String productName;
     private ProductCategory category;
+//    @ManyToOne
+//    @JoinColumn(name="vendor_id", referencedColumnName="id")
     private int vendorId;
     private Double unitPrice;
     private int quantity;

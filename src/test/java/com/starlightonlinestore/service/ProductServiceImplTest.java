@@ -10,8 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.math.BigDecimal;
-
 import static com.starlightonlinestore.data.models.ProductCategory.GROCERIES;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,14 +27,14 @@ public class ProductServiceImplTest {
     void setUp(){
         addProductRequest = new AddProductRequest();
 
-        addProductRequest.setName("Versace, Turtle-neck");
+        addProductRequest.setProductName("Versace, Turtle-neck");
         addProductRequest.setPrice(15000.00);
         addProductRequest.setCategory
                 (ProductCategory.FASHION);
         addProductRequest.setProductQuantity(32);
 
         addSecondProductRequest = new AddProductRequest();
-        addSecondProductRequest.setName("Bag Of Rice");
+        addSecondProductRequest.setProductName("Bag Of Rice");
         addSecondProductRequest.setPrice(45000.00);
         addSecondProductRequest.setCategory
                 (GROCERIES);
@@ -58,18 +56,17 @@ public class ProductServiceImplTest {
     void testThatProductCanBeUpdated() {
         ProductUpdateRequest productUpdateRequest = new ProductUpdateRequest();
         productUpdateRequest.setCategory(ProductCategory.APPLIANCES);
-        productUpdateRequest.setName("Standing Fan");
+        productUpdateRequest.setProductName("Standing Fan");
         productUpdateRequest.setUnitPrice(24000.00);
-        productUpdateRequest.setQuantity(20);
-        StoreResponse response = productService.updateProduct(352, productUpdateRequest);
+        productUpdateRequest.setProductQuantity(20);
+        StoreResponse response = productService.updateProduct(352, 2, productUpdateRequest);
         System.out.println(response);
         assertEquals("Product update successful", response.getMessage());
-
     }
 
     @Test
     void testThatProductCanBeDeleted() {
-        StoreResponse deleteResponse = productService.deleteProduct(352);
+        StoreResponse deleteResponse = productService.deleteProduct(352,1);
         System.out.println(deleteResponse);
         assertEquals("Product has been deleted", deleteResponse.getMessage());
     }

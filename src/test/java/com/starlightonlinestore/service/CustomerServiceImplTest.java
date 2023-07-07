@@ -88,7 +88,7 @@ public class CustomerServiceImplTest {
         editCustomerProfileRequest.setPhone( "07035893966");
 //        updateCustomer.setPassword("Englandmoro678#");
         StoreResponse updateCustomerResponse =
-                customerService.updateCustomer(1, editCustomerProfileRequest);
+                customerService.updateCustomer(302, editCustomerProfileRequest);
         System.out.println(updateCustomerResponse);
         assertEquals("Customer updated successfully", updateCustomerResponse.getMessage());
     }

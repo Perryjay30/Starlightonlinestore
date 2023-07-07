@@ -2,6 +2,7 @@ package com.starlightonlinestore.controller;
 
 import com.starlightonlinestore.data.dto.Request.AddProductRequest;
 import com.starlightonlinestore.data.dto.Request.ProductUpdateRequest;
+import com.starlightonlinestore.data.models.Product;
 import com.starlightonlinestore.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/product")
@@ -23,14 +26,19 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(addProductRequest));
     }
 
-    @PatchMapping("{id}")
-    public ResponseEntity<?> updateProduct(@Valid @RequestBody @PathVariable int id, ProductUpdateRequest productUpdateRequest) {
-        return ResponseEntity.ok(productService.updateProduct(id, productUpdateRequest));
+    @GetMapping("/viewAllProducts/{userId}")
+    public ResponseEntity<?> viewAllProducts(@PathVariable int userId) {
+       return ResponseEntity.ok(productService.viewAllProduct(userId));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable int id) {
+    @PatchMapping("/editProduct/{vendorId}/{productId}")
+    public ResponseEntity<?> updateProduct(@PathVariable Integer vendorId, @PathVariable Integer productId, @Valid @RequestBody ProductUpdateRequest productUpdateRequest) {
+        return ResponseEntity.ok(productService.updateProduct(vendorId, productId, productUpdateRequest));
+    }
+
+    @DeleteMapping("/{id}/{productId}")
+    public ResponseEntity<?> deleteProduct(@PathVariable Integer id, @PathVariable int productId) {
 //        log.info("Id -> {}", id);
-       return ResponseEntity.ok(productService.deleteProduct(id));
+       return ResponseEntity.ok(productService.deleteProduct(id, productId));
     }
 }

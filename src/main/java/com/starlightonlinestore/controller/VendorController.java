@@ -28,7 +28,7 @@ public class VendorController {
         return ResponseEntity.status(HttpStatus.CREATED).body(vendorService.createAccount(email, verifyOtpRequest));
     }
 
-    @GetMapping
+    @GetMapping("/vendorLogin")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         return ResponseEntity.ok(vendorService.login(loginRequest));
     }
@@ -44,23 +44,23 @@ public class VendorController {
     }
 
     @PostMapping("/changePassword/{email}")
-    public ResponseEntity<?> changePassword(@PathVariable String email, ChangePasswordRequest changePasswordRequest) {
+    public ResponseEntity<?> changePassword(@PathVariable String email, @Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
         return ResponseEntity.ok(vendorService.changePassword(email, changePasswordRequest));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCustomerById(@Valid @RequestBody @PathVariable int id, DeleteRequest deleteRequest) {
-        log.info("Id -> {}", id);
+    @DeleteMapping("/deleteVendor/{id}")
+    public ResponseEntity<?> deleteCustomerById(@PathVariable int id, @Valid @RequestBody DeleteRequest deleteRequest) {
+//        log.info("Id -> {}", id);
         return ResponseEntity.ok(vendorService.deleteVendor(id, deleteRequest));
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<?> updateCustomer(@Valid @RequestBody @PathVariable int id, UpdateVendorRequest updateVendorRequest) {
+    @PatchMapping("/updateVendorProfile/{id}")
+    public ResponseEntity<?> updateCustomer(@PathVariable int id, @Valid @RequestBody UpdateVendorRequest updateVendorRequest) {
         return ResponseEntity.ok(vendorService.updateVendor(id, updateVendorRequest));
     }
 
     @PostMapping("/addProduct/{id}")
-    public ResponseEntity<?> addProduct(@Valid @RequestBody @PathVariable int id, AddProductRequest addProductRequest) {
+    public ResponseEntity<?> addProduct(@PathVariable int id, @Valid @RequestBody AddProductRequest addProductRequest) {
         return ResponseEntity.ok(vendorService.addProduct(id, addProductRequest));
     }
 

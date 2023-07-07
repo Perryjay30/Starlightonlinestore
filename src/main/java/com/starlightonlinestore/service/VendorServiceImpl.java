@@ -236,7 +236,7 @@ public class VendorServiceImpl implements VendorService {
         Vendor savedVendor = vendorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
         Product product = new Product();
-        product.setProductName(addProductRequest.getName());
+        product.setProductName(addProductRequest.getProductName());
         product.setQuantity(addProductRequest.getProductQuantity());
         product.setUnitPrice(addProductRequest.getPrice());
         product.setCategory(ProductCategory.GROCERIES);
