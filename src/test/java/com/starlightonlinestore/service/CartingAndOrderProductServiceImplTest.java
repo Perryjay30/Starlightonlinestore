@@ -20,8 +20,8 @@ class CartingAndOrderProductServiceImplTest {
     void testThatCustomerCanAddProductToCart() {
         AddToCartRequest addToCartRequest= new AddToCartRequest();
         addToCartRequest.setProductId(1);
-        addToCartRequest.setQuantity(5);
-        StoreResponse productToCartResponse = cartingAndOrderProductService.addProductToCart(1, addToCartRequest);
+        addToCartRequest.setQuantity(2);
+        StoreResponse productToCartResponse = cartingAndOrderProductService.addProductToCart(302, addToCartRequest);
         assertEquals("Product successfully added to cart", productToCartResponse.getMessage());
     }
 

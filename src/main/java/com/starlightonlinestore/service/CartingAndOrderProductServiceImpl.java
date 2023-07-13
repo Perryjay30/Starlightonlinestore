@@ -33,8 +33,8 @@ public class CartingAndOrderProductServiceImpl implements CartingAndOrderProduct
     private final ProductRepository productRepository;
 
     @Override
-    public StoreResponse addProductToCart(Integer id, AddToCartRequest addToCartRequest) {
-        Customer customer = customerService.getFoundCustomer(customerRepository.findById(id),
+    public StoreResponse addProductToCart(Integer customerId, AddToCartRequest addToCartRequest) {
+        Customer customer = customerService.getFoundCustomer(customerRepository.findById(customerId),
                 "Customer doesn't exist");
         Cart cart = AddingItemsToCart(addToCartRequest);
         customer.getCustomerCart().add(cart);
@@ -50,7 +50,7 @@ public class CartingAndOrderProductServiceImpl implements CartingAndOrderProduct
         return new StoreResponse("Product has been removed from cart");
     }
 
-    public List<Cart> getAllCart() {
+    public List<Cart> getCart() {
         return cartRepository.findAll();
     }
 
@@ -73,7 +73,9 @@ public class CartingAndOrderProductServiceImpl implements CartingAndOrderProduct
     }
 
     @Override
-    public List<CustomerOrder> getAllOrders() {
+    public List<CustomerOrder> getAllOrders(Integer customerId) {
+        customerService.getFoundCustomer(customerRepository.findById(customerId),
+                "Customer doesn't exist");
         return customerOrderRepository.findAll();
     }
 
@@ -93,8 +95,8 @@ public class CartingAndOrderProductServiceImpl implements CartingAndOrderProduct
     }
 
     @Override
-    public StoreResponse orderProduct(Integer id, OrderProductRequest orderProductRequest) {
-        Customer customer = customerService.getFoundCustomer(customerRepository.findById(id),
+    public StoreResponse orderProduct(Integer customerId, OrderProductRequest orderProductRequest) {
+        Customer customer = customerService.getFoundCustomer(customerRepository.findById(customerId),
                 "Kindly enter a valid customer id");
         CustomerOrder customerOrder = new CustomerOrder();
         customerOrder.setDeliveryAddress(orderProductRequest.getDeliveryAddress());
@@ -110,7 +112,7 @@ public class CartingAndOrderProductServiceImpl implements CartingAndOrderProduct
 
     private void totalQuantityOfProductInCart(CustomerOrder customerOrder) {
         List<Integer> quantityCart = new ArrayList<>();
-        List<Cart> allCart = getAllCart();
+        List<Cart> allCart = getCart();
         int sum = 0;
         for (Cart myCart : allCart) {
             if(myCart.getQuantity() > 0) quantityCart.add(myCart.getQuantity());
@@ -123,7 +125,7 @@ public class CartingAndOrderProductServiceImpl implements CartingAndOrderProduct
 
     private void totalAmountOfAllProductInCart(CustomerOrder customerOrder) {
         List<Double> totalAmountCart = new ArrayList<>();
-        List<Cart> allCart = getAllCart();
+        List<Cart> allCart = getCart();
         double total = 0;
         for (Cart amountCart : allCart) {
             if(amountCart.getTotalPrice() > 0) totalAmountCart.add(amountCart.getTotalPrice());

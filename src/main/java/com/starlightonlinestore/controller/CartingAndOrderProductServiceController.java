@@ -1,6 +1,7 @@
 package com.starlightonlinestore.controller;
 
 import com.starlightonlinestore.data.dto.Request.AddToCartRequest;
+import com.starlightonlinestore.data.dto.Request.OrderProductRequest;
 import com.starlightonlinestore.data.dto.Request.PaymentRequest;
 import com.starlightonlinestore.service.CartingAndOrderProductService;
 import jakarta.mail.MessagingException;
@@ -13,23 +14,28 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/cartingAndProductOrder")
+@RequestMapping("/cartingAndProduct")
 @RequiredArgsConstructor
 public class CartingAndOrderProductServiceController {
 
     private final CartingAndOrderProductService cartingAndOrderProductService;
 
-    @PostMapping("/order/{id}")
-    public ResponseEntity<?> addProductToCart(@Valid @RequestBody @PathVariable int id, AddToCartRequest addToCartRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(cartingAndOrderProductService.addProductToCart(id, addToCartRequest));
+    @PostMapping("/carting/{customerId}")
+    public ResponseEntity<?> addProductToCart(@PathVariable int customerId, @Valid @RequestBody AddToCartRequest addToCartRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(cartingAndOrderProductService.addProductToCart(customerId, addToCartRequest));
     }
 
-    @GetMapping
-    public ResponseEntity<?> getAllMyOrders() {
-        return ResponseEntity.ok(cartingAndOrderProductService.getAllOrders());
+    @GetMapping("/allOrders/{customerId}")
+    public ResponseEntity<?> getAllMyOrders(@PathVariable Integer customerId) {
+        return ResponseEntity.ok(cartingAndOrderProductService.getAllOrders(customerId));
     }
 
-    @DeleteMapping("/deleteProductFromCart{customerId}/{productInCartId}")
+    @PostMapping("/placeOrder/{customerId}")
+    public ResponseEntity<?> orderProducts(@PathVariable int customerId, @RequestBody OrderProductRequest orderProductRequest) {
+        return ResponseEntity.ok(cartingAndOrderProductService.orderProduct(customerId, orderProductRequest));
+    }
+
+    @DeleteMapping("/deleteProductFromCart/{customerId}/{productInCartId}")
     public ResponseEntity<?> deleteProductFromCart(@PathVariable Integer customerId, @PathVariable Integer productInCartId) {
         return ResponseEntity.ok(cartingAndOrderProductService.removeProductFromCart(customerId, productInCartId));
     }

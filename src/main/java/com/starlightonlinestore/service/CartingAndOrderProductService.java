@@ -12,10 +12,10 @@ import java.util.List;
 
 public interface CartingAndOrderProductService {
     StoreResponse addProductToCart
-            (Integer id, AddToCartRequest addToCartRequest);
+            (Integer customerId, AddToCartRequest addToCartRequest);
     StoreResponse removeProductFromCart(Integer customerId, Integer productInCartId);
-    List<CustomerOrder> getAllOrders();
-    StoreResponse orderProduct(Integer id, OrderProductRequest orderProductRequest);
+    List<CustomerOrder> getAllOrders(Integer customerId);
+    StoreResponse orderProduct(Integer customerId, OrderProductRequest orderProductRequest);
     StoreResponse CustomerCanMakePaymentForGoodsOrdered
             (Integer customerId, Integer orderId, PaymentRequest paymentRequest) throws IOException, MessagingException;
 }
