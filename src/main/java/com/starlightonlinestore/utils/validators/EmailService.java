@@ -10,4 +10,5 @@ public interface EmailService {
     String buildEmail(String name, String link);
 
     void sendEmailForSuccessfulOrder(String recipientEmail, String name,  Integer orderId) throws MessagingException;
+    void emailForAssignRole(String recipientEmail, String name) throws MessagingException;
 }

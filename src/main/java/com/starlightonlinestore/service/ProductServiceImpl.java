@@ -3,8 +3,7 @@ package com.starlightonlinestore.service;
 import com.starlightonlinestore.data.exceptions.StoreException;
 import com.starlightonlinestore.data.models.Product;
 import com.starlightonlinestore.data.models.ProductCategory;
-import com.starlightonlinestore.data.models.Vendor;
-import com.starlightonlinestore.data.repository.CustomerRepository;
+import com.starlightonlinestore.data.repository.UserRepository;
 import com.starlightonlinestore.data.repository.ProductRepository;
 import com.starlightonlinestore.data.dto.Request.AddProductRequest;
 import com.starlightonlinestore.data.dto.Request.ProductUpdateRequest;
@@ -23,7 +22,7 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
 
-    private final CustomerRepository customerRepository;
+    private final UserRepository customerRepository;
 
     private final VendorRepository vendorRepository;
 

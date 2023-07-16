@@ -8,7 +8,7 @@ import com.starlightonlinestore.data.exceptions.StoreException;
 import com.starlightonlinestore.data.models.*;
 import com.starlightonlinestore.data.repository.CartRepository;
 import com.starlightonlinestore.data.repository.CustomerOrderRepository;
-import com.starlightonlinestore.data.repository.CustomerRepository;
+import com.starlightonlinestore.data.repository.UserRepository;
 import com.starlightonlinestore.data.repository.ProductRepository;
 import com.starlightonlinestore.utils.validators.EmailService;
 import jakarta.mail.MessagingException;
@@ -22,29 +22,29 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CartingAndOrderProductServiceImpl implements CartingAndOrderProductService{
+public class CartingAndOrderProductServiceImpl implements CartingAndOrderProductService {
 
     private final CustomerOrderRepository customerOrderRepository;
-    private  final CustomerRepository customerRepository;
+    private  final UserRepository customerRepository;
     private final CartRepository cartRepository;
     private final PaymentService paymentService;
     private final EmailService emailService;
-    private final CustomerServiceImpl customerService;
+    private final UserService userService;
     private final ProductRepository productRepository;
 
     @Override
     public StoreResponse addProductToCart(Integer customerId, AddToCartRequest addToCartRequest) {
-        Customer customer = customerService.getFoundCustomer(customerRepository.findById(customerId),
+        User user = userService.getFoundCustomer(customerRepository.findById(customerId),
                 "Customer doesn't exist");
         Cart cart = AddingItemsToCart(addToCartRequest);
-        customer.getCustomerCart().add(cart);
+        user.getCustomerCart().add(cart);
         cartRepository.save(cart);
         return new StoreResponse("Product successfully added to cart");
     }
 
     @Override
     public StoreResponse removeProductFromCart(Integer customerId, Integer productInCartId) {
-        customerService.getFoundCustomer(customerRepository.findById(customerId),
+        userService.getFoundCustomer(customerRepository.findById(customerId),
                 "Customer doesn't exist");
         cartRepository.deleteById(productInCartId);
         return new StoreResponse("Product has been removed from cart");
@@ -74,7 +74,7 @@ public class CartingAndOrderProductServiceImpl implements CartingAndOrderProduct
 
     @Override
     public List<CustomerOrder> getAllOrders(Integer customerId) {
-        customerService.getFoundCustomer(customerRepository.findById(customerId),
+        userService.getFoundCustomer(customerRepository.findById(customerId),
                 "Customer doesn't exist");
         return customerOrderRepository.findAll();
     }
@@ -82,25 +82,25 @@ public class CartingAndOrderProductServiceImpl implements CartingAndOrderProduct
 
     @Override
     public StoreResponse CustomerCanMakePaymentForGoodsOrdered(Integer customerId, Integer orderId, PaymentRequest paymentRequest) throws IOException, MessagingException {
-        Customer existingCustomer = customerService.getFoundCustomer(customerRepository.findById(customerId),
-                "Customer doesn't exist");
+        User existingUser = userService.getFoundCustomer(customerRepository.findById(customerId),
+                "User doesn't exist");
         CustomerOrder customerOrder = customerOrderRepository.findById(orderId)
                 .orElseThrow(() -> new StoreException("Goods wasn't ordered"));
         paymentService.makePaymentForGoods(paymentRequest);
         customerOrder.setOrderStatus(OrderStatus.ORDER_SUCCESSFUL);
         customerOrder.setPaymentStatus(PaymentStatus.PAYMENT_SUCCESSFUL);
         cartRepository.deleteAll();
-        emailService.sendEmailForSuccessfulOrder(existingCustomer.getEmail(), existingCustomer.getFirstName(), customerOrder.getOrderId());
+        emailService.sendEmailForSuccessfulOrder(existingUser.getEmail(), existingUser.getFirstName(), customerOrder.getOrderId());
         return new StoreResponse("Order placed, Check your email for notification");
     }
 
     @Override
     public StoreResponse orderProduct(Integer customerId, OrderProductRequest orderProductRequest) {
-        Customer customer = customerService.getFoundCustomer(customerRepository.findById(customerId),
+        User user = userService.getFoundCustomer(customerRepository.findById(customerId),
                 "Kindly enter a valid customer id");
         CustomerOrder customerOrder = new CustomerOrder();
         customerOrder.setDeliveryAddress(orderProductRequest.getDeliveryAddress());
-        customer.getDeliveryAddress().add(customerOrder.getDeliveryAddress());
+        user.getDeliveryAddress().add(customerOrder.getDeliveryAddress());
         customerOrder.setLocalDateTime(LocalDateTime.now());
         customerOrder.setOrderStatus(OrderStatus.PENDING);
         customerOrder.setPaymentStatus(PaymentStatus.PROCESSING);

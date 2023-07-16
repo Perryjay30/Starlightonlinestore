@@ -6,7 +6,6 @@ import com.starlightonlinestore.data.dto.Request.PaymentRequest;
 import com.starlightonlinestore.service.CartingAndOrderProductService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +14,13 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/cartingAndProduct")
-@RequiredArgsConstructor
 public class CartingAndOrderProductServiceController {
 
     private final CartingAndOrderProductService cartingAndOrderProductService;
+
+    public CartingAndOrderProductServiceController(CartingAndOrderProductService cartingAndOrderProductService) {
+        this.cartingAndOrderProductService = cartingAndOrderProductService;
+    }
 
     @PostMapping("/carting/{customerId}")
     public ResponseEntity<?> addProductToCart(@PathVariable int customerId, @Valid @RequestBody AddToCartRequest addToCartRequest) {

@@ -75,6 +75,8 @@ public class VendorServiceImpl implements VendorService {
         vendor.setPassword(createVendorRequest.getPassword());
         vendor.setStoreName(createVendorRequest.getStoreName());
         vendor.setStatus(UNVERIFIED);
+//        Role role = new Role();
+//        role.setRoleName("VENDOR");
         vendor.setRole(VENDOR);
         return vendor;
     }

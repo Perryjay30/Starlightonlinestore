@@ -1,7 +1,7 @@
 package com.starlightonlinestore.controller;
 
 import com.starlightonlinestore.data.dto.Request.*;
-import com.starlightonlinestore.service.CustomerService;
+import com.starlightonlinestore.service.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -15,52 +15,57 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/customer")
 @Slf4j
 @CrossOrigin(origins = "*")
-public class CustomerController {
+public class UserController {
 
     @Autowired
-    private CustomerService customerService;
+    private UserService userService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody CustomerRegistrationRequest
                                               customerRegistrationRequest) {
-        return ResponseEntity.ok(customerService.register(customerRegistrationRequest));
+        return ResponseEntity.ok(userService.register(customerRegistrationRequest));
     }
 
     @PostMapping("/createAccount/{email}")
     public ResponseEntity<?> createAccount(@PathVariable String email, @Valid @RequestBody VerifyOtpRequest verifyOtpRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(customerService.createAccount(email, verifyOtpRequest));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createAccount(email, verifyOtpRequest));
     }
 
 
     @GetMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        return ResponseEntity.ok(customerService.login(loginRequest));
+        return ResponseEntity.ok(userService.login(loginRequest));
     }
 
     @PostMapping("/forgotPassword")
     public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest) throws MessagingException {
-        return ResponseEntity.ok(customerService.forgotPassword(forgotPasswordRequest));
+        return ResponseEntity.ok(userService.forgotPassword(forgotPasswordRequest));
     }
 
     @PostMapping("/resetPassword/{email}")
     public ResponseEntity<?> resetPassword(@PathVariable String email, @Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
-        return ResponseEntity.ok(customerService.resetPassword(email, resetPasswordRequest));
+        return ResponseEntity.ok(userService.resetPassword(email, resetPasswordRequest));
     }
 
     @PostMapping("/changePassword/{email}")
     public ResponseEntity<?> changePassword(@PathVariable String email, ChangePasswordRequest changePasswordRequest) {
-        return ResponseEntity.ok(customerService.changePassword(email, changePasswordRequest));
+        return ResponseEntity.ok(userService.changePassword(email, changePasswordRequest));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCustomerById(@PathVariable int id, @Valid @RequestBody DeleteRequest deleteRequest) {
         log.info("Id -> {}", id);
-      return ResponseEntity.ok(customerService.deleteCustomer(id, deleteRequest));
+      return ResponseEntity.ok(userService.deleteCustomer(id, deleteRequest));
     }
 
     @PatchMapping("/updateProfile/{id}")
     public ResponseEntity<?> updateCustomer(@PathVariable int id, @Valid @RequestBody EditCustomerProfileRequest editCustomerProfileRequest) {
-       return ResponseEntity.ok(customerService.updateCustomer(id, editCustomerProfileRequest));
+       return ResponseEntity.ok(userService.updateCustomer(id, editCustomerProfileRequest));
+    }
+
+    @PostMapping("/assignRoles")
+    public ResponseEntity<?> assignRoles(@RequestBody AssignRoleRequest assignRoleRequest) throws MessagingException {
+        return ResponseEntity.ok(userService.assignRoles(assignRoleRequest));
     }
 
 }

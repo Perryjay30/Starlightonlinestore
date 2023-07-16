@@ -20,16 +20,16 @@ public class OTPToken {
     private LocalDateTime verifiedAt;
     @ManyToOne
     @JoinColumn(name="customer_id", referencedColumnName="id")
-    private Customer customer;
+    private User user;
 
     @ManyToOne
     @JoinColumn(name="vendor_id", referencedColumnName="id")
     private Vendor vendor;
 
-    public OTPToken(String token, LocalDateTime createdAt, LocalDateTime expiredAt, Customer customer) {
+    public OTPToken(String token, LocalDateTime createdAt, LocalDateTime expiredAt, User user) {
         this.token = token;
         this.createdAt = createdAt;
         this.expiredAt = expiredAt;
-        this.customer = customer;
+        this.user = user;
     }
 }

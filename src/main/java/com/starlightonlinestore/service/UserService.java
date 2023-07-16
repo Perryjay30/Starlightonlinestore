@@ -2,10 +2,13 @@ package com.starlightonlinestore.service;
 
 import com.starlightonlinestore.data.dto.Request.*;
 import com.starlightonlinestore.data.dto.Response.*;
+import com.starlightonlinestore.data.models.User;
 import jakarta.mail.MessagingException;
 
+import java.util.Optional;
 
-public interface CustomerService {
+
+public interface UserService {
     String register(CustomerRegistrationRequest customerRegistrationRequest);
 
     CustomerRegistrationResponse createAccount(String email, VerifyOtpRequest verifyOtpRequest);
@@ -26,4 +29,6 @@ public interface CustomerService {
     StoreResponse changePassword(String email, ChangePasswordRequest changePasswordRequest);
 
     StoreResponse updateCustomer(Integer id, EditCustomerProfileRequest editCustomerProfileRequest);
+    StoreResponse assignRoles(AssignRoleRequest assignRoleRequest) throws MessagingException;
+    User getFoundCustomer(Optional<User> customerRepository, String message);
 }

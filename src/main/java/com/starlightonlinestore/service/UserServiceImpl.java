@@ -1,14 +1,16 @@
 package com.starlightonlinestore.service;
 
 import com.starlightonlinestore.data.exceptions.CustomerRegistrationException;
+import com.starlightonlinestore.data.exceptions.StoreException;
 import com.starlightonlinestore.data.models.*;
-import com.starlightonlinestore.data.repository.CustomerRepository;
+import com.starlightonlinestore.data.repository.UserRepository;
 import com.starlightonlinestore.data.dto.Request.*;
 import com.starlightonlinestore.data.dto.Response.*;
 import com.starlightonlinestore.data.repository.OtpTokenRepository;
 import com.starlightonlinestore.utils.validators.EmailService;
 import com.starlightonlinestore.utils.validators.Token;
 import com.starlightonlinestore.utils.validators.UserDetailsValidator;
+import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +20,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static com.starlightonlinestore.data.models.Role.CUSTOMER;
+import static com.starlightonlinestore.data.models.Role.*;
 import static com.starlightonlinestore.data.models.Status.UNVERIFIED;
 import static com.starlightonlinestore.data.models.Status.VERIFIED;
 
@@ -26,19 +28,18 @@ import static com.starlightonlinestore.data.models.Status.VERIFIED;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class CustomerServiceImpl implements CustomerService {
-    private final CustomerRepository customerRepository;
+public class UserServiceImpl implements UserService {
+    private final UserRepository userRepository;
     private final OtpTokenRepository otpTokenRepository;
     private final EmailService emailService;
-
 
     @Override
     public String register(CustomerRegistrationRequest registrationRequest) {
         if(!UserDetailsValidator.isValidEmailAddress(registrationRequest.getEmail()))
             throw new CustomerRegistrationException(String.
                     format("email %s is invalid", registrationRequest.getEmail()));
-        Customer customer = buildBuyer(registrationRequest);
-        customerRepository.save(customer);
+        User user = buildBuyer(registrationRequest);
+        userRepository.save(user);
         SendOtpRequest OTPRequest = new SendOtpRequest();
         OTPRequest.setEmail(registrationRequest.getEmail());
         return sendOTP(OTPRequest);
@@ -50,10 +51,10 @@ public class CustomerServiceImpl implements CustomerService {
 //        log.info(verifyOtpRequest.getToken());
         verifyOTP(verifyOtpRequest);
         var savedCustomer =
-                getFoundCustomer(customerRepository.findByEmail(email), "Customer does not exists");
+                getFoundCustomer(userRepository.findByEmail(email), "Customer does not exists");
 //        savedCustomer.setStatus(VERIFIED);
 //        customerRepository.save(savedCustomer);
-        customerRepository.enableCustomer(VERIFIED, savedCustomer.getEmail());
+        userRepository.enableUser(VERIFIED, savedCustomer.getEmail());
         return buildBuyerRegistrationResponse(savedCustomer);
     }
 
@@ -75,11 +76,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public String forgotPassword(ForgotPasswordRequest forgotPasswordRequest) throws MessagingException {
-        Customer forgotCustomer = getFoundCustomer(customerRepository.findByEmail(forgotPasswordRequest.getEmail()), "This email is not registered");
+        User forgotUser = getFoundCustomer(userRepository.findByEmail(forgotPasswordRequest.getEmail()), "This email is not registered");
         String token = Token.generateToken(4);
-        OTPToken otpToken = new OTPToken(token, LocalDateTime.now(), LocalDateTime.now().plusMinutes(10), forgotCustomer);
+        OTPToken otpToken = new OTPToken(token, LocalDateTime.now(), LocalDateTime.now().plusMinutes(10), forgotUser);
         otpTokenRepository.save(otpToken);
-        emailService.sendEmail(forgotPasswordRequest.getEmail(), forgotCustomer.getFirstName(), token);
+        emailService.sendEmail(forgotPasswordRequest.getEmail(), forgotUser.getFirstName(), token);
         return "Token successfully sent to your email. Please check.";
 //        SendOtpRequest request = new SendOtpRequest();
 //        request.setEmail(forgotPasswordRequest.getEmail());
@@ -91,10 +92,10 @@ public class CustomerServiceImpl implements CustomerService {
         VerifyOtpRequest verifyOtpRequest = new VerifyOtpRequest();
         verifyOtpRequest.setToken(resetPasswordRequest.getToken());
         verifyOTP(verifyOtpRequest);
-        Customer foundCustomer = customerRepository.findByEmail(email).get();
-        foundCustomer.setPassword(resetPasswordRequest.getPassword());
+        User foundUser = userRepository.findByEmail(email).get();
+        foundUser.setPassword(resetPasswordRequest.getPassword());
         if(BCrypt.checkpw(resetPasswordRequest.getConfirmPassword(), resetPasswordRequest.getPassword())) {
-            customerRepository.save(foundCustomer);
+            userRepository.save(foundUser);
             return new StoreResponse("Your password has been reset successfully");
         } else {
             throw new IllegalStateException("Password does not match");
@@ -108,49 +109,51 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public String sendOTP(SendOtpRequest sendOtpRequest) {
-        Customer savedCustomer = getFoundCustomer(customerRepository.findByEmail(sendOtpRequest.getEmail()), "Email not found");
-        return generateOtpToken(sendOtpRequest, savedCustomer);
+        User savedUser = getFoundCustomer(userRepository.findByEmail(sendOtpRequest.getEmail()), "Email not found");
+        return generateOtpToken(sendOtpRequest, savedUser);
     }
 
-    private String generateOtpToken(SendOtpRequest sendOtpRequest, Customer savedCustomer) {
+    private String generateOtpToken(SendOtpRequest sendOtpRequest, User savedUser) {
         String token = Token.generateToken(4);
-        OTPToken otpToken = new OTPToken(token, LocalDateTime.now(), LocalDateTime.now().plusMinutes(10), savedCustomer);
+        OTPToken otpToken = new OTPToken(token, LocalDateTime.now(), LocalDateTime.now().plusMinutes(10), savedUser);
         otpTokenRepository.save(otpToken);
-        emailService.send(sendOtpRequest.getEmail(), emailService.buildEmail(savedCustomer.getFirstName(), token));
+        emailService.send(sendOtpRequest.getEmail(), emailService.buildEmail(savedUser.getFirstName(), token));
         return "Token successfully sent to your email. Please check.";
 
     }
-    private CustomerRegistrationResponse buildBuyerRegistrationResponse(Customer savedCustomer) {
+    private CustomerRegistrationResponse buildBuyerRegistrationResponse(User savedUser) {
         CustomerRegistrationResponse response = new CustomerRegistrationResponse();
         response.setMessage("User registration successful");
         response.setStatusCode(201);
-        response.setUserId(savedCustomer.getId());
+        response.setUserId(savedUser.getId());
         return response;
     }
 
-    private Customer buildBuyer(CustomerRegistrationRequest registrationRequest) {
-        Customer customer = new Customer();
-        customer.setFirstName(registrationRequest.getFirstName());
-        customer.setLastName(registrationRequest.getLastName());
-        if(customerRepository.findByEmail(registrationRequest.getEmail()).isPresent())
+    private User buildBuyer(CustomerRegistrationRequest registrationRequest) {
+        User user = new User();
+        user.setFirstName(registrationRequest.getFirstName());
+        user.setLastName(registrationRequest.getLastName());
+        if(userRepository.findByEmail(registrationRequest.getEmail()).isPresent())
             throw new RuntimeException("This email has been taken, kindly register with another email address");
         else
-            customer.setEmail(registrationRequest.getEmail());
-        customer.setPassword(registrationRequest.getPassword());
-        customer.setStatus(UNVERIFIED);
-        customer.setRole(CUSTOMER);
-        return customer;
+            user.setEmail(registrationRequest.getEmail());
+        user.setPassword(registrationRequest.getPassword());
+        user.setStatus(UNVERIFIED);
+//        Role role = new Role();
+//        role.setRoleName("USER");
+        user.setRole(USER);
+        return user;
     }
 
     @Override
     public LoginResponse login(LoginRequest loginRequest) {
-        Customer foundCustomer = getFoundCustomer(customerRepository.findByEmail(loginRequest
+        User foundUser = getFoundCustomer(userRepository.findByEmail(loginRequest
                 .getEmail()), "your email is incorrect");
-        if(foundCustomer.getStatus() != VERIFIED) throw new RuntimeException("Customer is not verified");
+        if(foundUser.getStatus() != VERIFIED) throw new RuntimeException("Customer is not verified");
 //      foundCustomer.setEmail(loginRequest.getEmail())
         LoginResponse loginResponse = new LoginResponse();
 //        if(foundCustomer.getPassword().equals(loginRequest.getPassword())) {
-        if(BCrypt.checkpw(loginRequest.getPassword(), foundCustomer.getPassword())) {
+        if(BCrypt.checkpw(loginRequest.getPassword(), foundUser.getPassword())) {
             loginResponse.setMessage("successful login");
             return loginResponse;
         }
@@ -160,46 +163,60 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public StoreResponse changePassword(String email, ChangePasswordRequest changePasswordRequest) {
-        Customer verifiedCustomer = getFoundCustomer(customerRepository.findByEmail(email), "customer isn't registered");
-        if(BCrypt.checkpw(changePasswordRequest.getOldPassword(), verifiedCustomer.getPassword()))
-            verifiedCustomer.setPassword(changePasswordRequest.getNewPassword());
-        customerRepository.save(verifiedCustomer);
+        User verifiedUser = getFoundCustomer(userRepository.findByEmail(email), "customer isn't registered");
+        if(BCrypt.checkpw(changePasswordRequest.getOldPassword(), verifiedUser.getPassword()))
+            verifiedUser.setPassword(changePasswordRequest.getNewPassword());
+        userRepository.save(verifiedUser);
         return new StoreResponse("Your password has been successfully changed");
     }
 
     @Override
     public StoreResponse deleteCustomer(int id, DeleteRequest deleteRequest) {
-        Customer foundCustomer = getFoundCustomer(customerRepository.findById(id), "Customer doesn't exist");
+        User foundUser = getFoundCustomer(userRepository.findById(id), "Customer doesn't exist");
         String randomToken = UUID.randomUUID().toString();
         String encoded = BCrypt.hashpw(randomToken, BCrypt.gensalt());
-        if (BCrypt.checkpw(deleteRequest.getPassword(), foundCustomer.getPassword())) {
-            String deleteCustomer = "Deleted" + " " + foundCustomer.getEmail() + " " + encoded;
-            foundCustomer.setEmail(deleteCustomer);
-            customerRepository.save(foundCustomer);
+        if (BCrypt.checkpw(deleteRequest.getPassword(), foundUser.getPassword())) {
+            String deleteCustomer = "Deleted" + " " + foundUser.getEmail() + " " + encoded;
+            foundUser.setEmail(deleteCustomer);
+            userRepository.save(foundUser);
             return new StoreResponse("Customer deleted");
         } else {
             throw new RuntimeException("Customer can't be deleted");
         }
     }
 
-    public Customer getFoundCustomer(Optional<Customer> customerRepository, String message) {
-        return customerRepository.orElseThrow(
+    @Override
+    public User getFoundCustomer(Optional<User> userRepository, String message) {
+        return userRepository.orElseThrow(
                 () -> new RuntimeException(message));
     }
 
     @Override
     public StoreResponse updateCustomer(Integer id, EditCustomerProfileRequest editCustomerProfileRequest) {
-        var customer = customerRepository.findById(id);
+        var customer = userRepository.findById(id);
         if (customer.isEmpty()) throw new RuntimeException("customer not found");
-        Customer foundCustomer = updatingTheCustomer(editCustomerProfileRequest, customer);
-        customerRepository.save(foundCustomer);
+        User foundUser = updatingTheCustomer(editCustomerProfileRequest, customer);
+        userRepository.save(foundUser);
         return new StoreResponse("Customer updated successfully");
     }
 
-    private Customer updatingTheCustomer(EditCustomerProfileRequest editCustomerProfileRequest, Optional<Customer> customer) {
+    @Override
+    public StoreResponse assignRoles(AssignRoleRequest assignRoleRequest) throws MessagingException {
+        User existingUser = userRepository.findByEmail(assignRoleRequest.getEmail())
+                .orElseThrow(() -> new StoreException("User isn't available"));
+//        Role role = new Role();
+//        role.setRoleName(assignRoleRequest.getUserRole());
+        if(existingUser.getRole().equals(USER)) existingUser.setRole(Role.valueOf(assignRoleRequest.getUserRole().toUpperCase()));
+        else throw new StoreException("User role already exists");
+        userRepository.save(existingUser);
+//        emailService.emailForAssignRole(existingUser.getEmail(), existingUser.getFirstName());
+        return new StoreResponse(existingUser.getFirstName() + " is now an admin");
+    }
+
+    private User updatingTheCustomer(EditCustomerProfileRequest editCustomerProfileRequest, Optional<User> customer) {
         var foundCustomer = customer.get();
         foundCustomer.setFirstName(editCustomerProfileRequest.getFirstName());
-        if(customerRepository.findByPhoneNumber(editCustomerProfileRequest.getPhone()).isPresent())
+        if(userRepository.findByPhoneNumber(editCustomerProfileRequest.getPhone()).isPresent())
             throw new RuntimeException("This Phone Number has been taken, kindly register with another");
         else
             foundCustomer.setPhoneNumber(editCustomerProfileRequest.getPhone()!= null && !editCustomerProfileRequest.getPhone()
@@ -207,12 +224,12 @@ public class CustomerServiceImpl implements CustomerService {
         return stillUpdatingCustomer(editCustomerProfileRequest, foundCustomer);
     }
 
-    private Customer stillUpdatingCustomer(EditCustomerProfileRequest editCustomerProfileRequest, Customer foundCustomer) {
-        foundCustomer.setLastName(editCustomerProfileRequest.getLastName());
-        Set<String> buyersAddressList = foundCustomer.getDeliveryAddress();
+    private User stillUpdatingCustomer(EditCustomerProfileRequest editCustomerProfileRequest, User foundUser) {
+        foundUser.setLastName(editCustomerProfileRequest.getLastName());
+        Set<String> buyersAddressList = foundUser.getDeliveryAddress();
         buyersAddressList.add(editCustomerProfileRequest.getDeliveryAddress());
-        foundCustomer.setEmail(editCustomerProfileRequest.getEmail() != null && !editCustomerProfileRequest.getEmail()
-                .equals("") ? editCustomerProfileRequest.getEmail() : foundCustomer.getEmail());
-        return foundCustomer;
+        foundUser.setEmail(editCustomerProfileRequest.getEmail() != null && !editCustomerProfileRequest.getEmail()
+                .equals("") ? editCustomerProfileRequest.getEmail() : foundUser.getEmail());
+        return foundUser;
     }
 }

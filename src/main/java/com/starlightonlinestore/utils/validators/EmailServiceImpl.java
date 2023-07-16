@@ -81,6 +81,22 @@ public class EmailServiceImpl implements EmailService {
         javaMailSender.send(mimeMessage);
     }
 
+    @Override
+    public void emailForAssignRole(String recipientEmail, String name) throws MessagingException {
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
+        messageHelper.setFrom("pelumijsh@gmail.com");
+        String subject = "Admin Notification";
+        String content = "<p>Hello " + name + ",</p>"
+                + "<p>This is to notify you that you're now an Admin of Starlight Online Store. " +
+                "Kindly login to the app to confirm.</p>";
+        messageHelper.setSubject(subject);
+        messageHelper.setTo(recipientEmail);
+        messageHelper.setText(content, true);
+        javaMailSender.send(mimeMessage);
+
+    }
+
     public String buildEmail(String name, String link) {
         return "<div style=\"font-family:Helvetica,Arial,sans-serif;font-size:16px;margin:0;color:#0b0c0c\">\n" +
                 "\n" +

@@ -11,12 +11,12 @@ import java.util.*;
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class Customer  {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     private String firstName;
-    private String LastName;
+    private String lastName;
     @Enumerated(EnumType.STRING)
     private Status status;
     private String email;
