@@ -66,7 +66,7 @@ public class ProductServiceImplTest {
 
     @Test
     void testThatProductCanBeDeleted() {
-        StoreResponse deleteResponse = productService.deleteProduct(352,1);
+        StoreResponse deleteResponse = productService.deleteProduct(2,1);
         System.out.println(deleteResponse);
         assertEquals("Product has been deleted", deleteResponse.getMessage());
     }

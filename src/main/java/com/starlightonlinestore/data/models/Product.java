@@ -13,6 +13,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private String productName;
+//    @Enumerated(EnumType.STRING)
     private ProductCategory category;
 //    @ManyToOne
 //    @JoinColumn(name="vendor_id", referencedColumnName="id")

@@ -25,7 +25,7 @@ import java.util.List;
 public class CartingAndOrderProductServiceImpl implements CartingAndOrderProductService {
 
     private final CustomerOrderRepository customerOrderRepository;
-    private  final UserRepository customerRepository;
+    private  final UserRepository userRepository;
     private final CartRepository cartRepository;
     private final PaymentService paymentService;
     private final EmailService emailService;
@@ -34,7 +34,7 @@ public class CartingAndOrderProductServiceImpl implements CartingAndOrderProduct
 
     @Override
     public StoreResponse addProductToCart(Integer customerId, AddToCartRequest addToCartRequest) {
-        User user = userService.getFoundCustomer(customerRepository.findById(customerId),
+        User user = userService.getFoundCustomer(userRepository.findById(customerId),
                 "Customer doesn't exist");
         Cart cart = AddingItemsToCart(addToCartRequest);
         user.getCustomerCart().add(cart);
@@ -44,7 +44,7 @@ public class CartingAndOrderProductServiceImpl implements CartingAndOrderProduct
 
     @Override
     public StoreResponse removeProductFromCart(Integer customerId, Integer productInCartId) {
-        userService.getFoundCustomer(customerRepository.findById(customerId),
+        userService.getFoundCustomer(userRepository.findById(customerId),
                 "Customer doesn't exist");
         cartRepository.deleteById(productInCartId);
         return new StoreResponse("Product has been removed from cart");
@@ -54,6 +54,13 @@ public class CartingAndOrderProductServiceImpl implements CartingAndOrderProduct
         return cartRepository.findAll();
     }
 
+    public void removeProduct() {
+        List<Cart> theCart = getCart();
+        for (Cart cart : theCart) {
+//            if(cart.getProductId() == )
+        }
+    }
+
     private Cart AddingItemsToCart(AddToCartRequest addToCartRequest) {
         Product availableProduct = productRepository.findById(addToCartRequest.getProductId())
                 .orElseThrow(() -> new StoreException("Product isn't available"));
@@ -61,20 +68,22 @@ public class CartingAndOrderProductServiceImpl implements CartingAndOrderProduct
         newCart.setProductName(availableProduct.getProductName());
         newCart.setProductCategory(availableProduct.getCategory());
         newCart.setUnitPrice(availableProduct.getUnitPrice());
-        if(availableProduct.getQuantity() >= addToCartRequest.getQuantity()) {
+        return AddingItemsToCart2(addToCartRequest, availableProduct, newCart);
+    }
+
+    private Cart AddingItemsToCart2(AddToCartRequest addToCartRequest, Product availableProduct, Cart newCart) {
+        if(availableProduct.getQuantity() >= addToCartRequest.getQuantity())
             newCart.setQuantity(addToCartRequest.getQuantity());
-        } else {
-            throw new StoreException("order quantity larger than available quantity");
-        }
+            else throw new StoreException("order quantity larger than available quantity");
+//        int i = newCart.getQuantity() - availableProduct.getQuantity();
         newCart.setTotalPrice(availableProduct.getUnitPrice() * addToCartRequest.getQuantity());
         newCart.setLocalDateTime(LocalDateTime.now());
-//        order.setTotal(order.getPrice() * order.getQuantity());
         return newCart;
     }
 
     @Override
     public List<CustomerOrder> getAllOrders(Integer customerId) {
-        userService.getFoundCustomer(customerRepository.findById(customerId),
+        userService.getFoundCustomer(userRepository.findById(customerId),
                 "Customer doesn't exist");
         return customerOrderRepository.findAll();
     }
@@ -82,7 +91,7 @@ public class CartingAndOrderProductServiceImpl implements CartingAndOrderProduct
 
     @Override
     public StoreResponse CustomerCanMakePaymentForGoodsOrdered(Integer customerId, Integer orderId, PaymentRequest paymentRequest) throws IOException, MessagingException {
-        User existingUser = userService.getFoundCustomer(customerRepository.findById(customerId),
+        User existingUser = userService.getFoundCustomer(userRepository.findById(customerId),
                 "User doesn't exist");
         CustomerOrder customerOrder = customerOrderRepository.findById(orderId)
                 .orElseThrow(() -> new StoreException("Goods wasn't ordered"));
@@ -96,7 +105,7 @@ public class CartingAndOrderProductServiceImpl implements CartingAndOrderProduct
 
     @Override
     public StoreResponse orderProduct(Integer customerId, OrderProductRequest orderProductRequest) {
-        User user = userService.getFoundCustomer(customerRepository.findById(customerId),
+        User user = userService.getFoundCustomer(userRepository.findById(customerId),
                 "Kindly enter a valid customer id");
         CustomerOrder customerOrder = new CustomerOrder();
         customerOrder.setDeliveryAddress(orderProductRequest.getDeliveryAddress());
