@@ -18,7 +18,7 @@ public interface ProductService {
 
 
     StoreResponse updateProduct
-            (Integer vendorId, Integer productId, ProductUpdateRequest productUpdateRequest);
+            (Integer productId, ProductUpdateRequest productUpdateRequest);
 
     StoreResponse deleteProduct(Integer id, int productId);
 

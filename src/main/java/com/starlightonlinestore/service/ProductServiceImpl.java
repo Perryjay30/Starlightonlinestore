@@ -3,13 +3,13 @@ package com.starlightonlinestore.service;
 import com.starlightonlinestore.data.exceptions.StoreException;
 import com.starlightonlinestore.data.models.Product;
 import com.starlightonlinestore.data.models.ProductCategory;
-import com.starlightonlinestore.data.repository.UserRepository;
 import com.starlightonlinestore.data.repository.ProductRepository;
 import com.starlightonlinestore.data.dto.Request.AddProductRequest;
 import com.starlightonlinestore.data.dto.Request.ProductUpdateRequest;
 import com.starlightonlinestore.data.dto.Response.AddProductResponse;
 import com.starlightonlinestore.data.dto.Response.StoreResponse;
-import com.starlightonlinestore.data.repository.VendorRepository;
+//import com.starlightonlinestore.data.repository.VendorRepository;
+import com.starlightonlinestore.data.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +23,6 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
     private final UserRepository customerRepository;
-
-    private final VendorRepository vendorRepository;
 
 
     @Override
@@ -57,8 +55,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public StoreResponse updateProduct(Integer userId, Integer productId, ProductUpdateRequest productUpdateRequest) {
-        findVendor(userId);
+    public StoreResponse updateProduct(Integer productId, ProductUpdateRequest productUpdateRequest) {
+//        findVendor(userId);
         var foundProduct = productRepository.findById(productId)
                 .orElseThrow(() -> new StoreException("Product can't be found"));
         updatingProduct(productUpdateRequest, foundProduct);
@@ -76,14 +74,14 @@ public class ProductServiceImpl implements ProductService {
                 productUpdateRequest.getUnitPrice() : foundProduct.getUnitPrice());
     }
 
-    private void findVendor(Integer userId) {
-        vendorRepository.findById(userId)
-                .orElseThrow(() -> new StoreException("Vendor isn't available"));
-    }
+//    private void findVendor(Integer userId) {
+//        userRepository.findById(userId)
+//                .orElseThrow(() -> new StoreException("Vendor isn't available"));
+//    }
 
     @Override
     public StoreResponse deleteProduct(Integer id, int productId) {
-        findVendor(id);
+//        findVendor(id);
         productRepository.deleteById(productId);
         return new StoreResponse("Product has been deleted");
     }

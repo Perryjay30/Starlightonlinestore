@@ -12,9 +12,9 @@ CreateVendorResponse createAccount(String email, VerifyOtpRequest verifyOtpReque
 
 void verifyOTP(VerifyOtpRequest verifyOtpRequest);
 
-String forgotPassword(ForgotPasswordRequest forgotPasswordRequest) throws MessagingException;
-
-StoreResponse resetPassword(String email, ResetPasswordRequest resetPasswordRequest);
+//String forgotPassword(ForgotPasswordRequest forgotPasswordRequest) throws MessagingException;
+//
+//StoreResponse resetPassword(String email, ResetPasswordRequest resetPasswordRequest);
 
 String sendOTP(SendOtpRequest sendOtpRequest);
 LoginResponse login(LoginRequest loginRequest);
@@ -23,6 +23,6 @@ StoreResponse updateVendor(Integer id, UpdateVendorRequest updateVendorRequest);
 StoreResponse deleteVendor(Integer id, DeleteRequest deleteRequest);
 StoreResponse changePassword(String email, ChangePasswordRequest changePasswordRequest);
 
-StoreResponse addProduct(int id, AddProductRequest addProductRequest);
+StoreResponse addProduct(AddProductRequest addProductRequest);
 
 }

@@ -5,14 +5,13 @@ import com.starlightonlinestore.data.exceptions.CustomerRegistrationException;
 import com.starlightonlinestore.data.models.*;
 import com.starlightonlinestore.data.repository.OtpTokenRepository;
 import com.starlightonlinestore.data.repository.ProductRepository;
-import com.starlightonlinestore.data.repository.VendorRepository;
+import com.starlightonlinestore.data.repository.UserRepository;
 import com.starlightonlinestore.data.dto.Response.CreateVendorResponse;
 import com.starlightonlinestore.data.dto.Response.LoginResponse;
 import com.starlightonlinestore.data.dto.Response.StoreResponse;
 import com.starlightonlinestore.utils.validators.EmailService;
 import com.starlightonlinestore.utils.validators.Token;
 import com.starlightonlinestore.utils.validators.UserDetailsValidator;
-import jakarta.mail.MessagingException;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,20 +28,22 @@ import static com.starlightonlinestore.data.models.Status.VERIFIED;
 @Service
 public class VendorServiceImpl implements VendorService {
 
-    private final VendorRepository vendorRepository;
+    private final UserRepository userRepository;
 
     private final ProductRepository productRepository;
 
     private final OtpTokenRepository otpTokenRepository;
 
     private final EmailService emailService;
+    private final UserService userService;
 
     @Autowired
-    public VendorServiceImpl(VendorRepository vendorRepository, ProductRepository productRepository, OtpTokenRepository otpTokenRepository, EmailService emailService) {
-        this.vendorRepository = vendorRepository;
+    public VendorServiceImpl(UserRepository userRepository, ProductRepository productRepository, OtpTokenRepository otpTokenRepository, EmailService emailService, UserService userService) {
+        this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.otpTokenRepository = otpTokenRepository;
         this.emailService = emailService;
+        this.userService = userService;
     }
 
     @Override
@@ -50,15 +51,15 @@ public class VendorServiceImpl implements VendorService {
         if(!UserDetailsValidator.isValidEmailAddress(createVendorRequest.getEmailAddress()))
             throw new CustomerRegistrationException(String.
                     format("email %s is invalid", createVendorRequest.getEmailAddress()));
-        Vendor vendor = registeringVendor(createVendorRequest);
-        vendorRepository.save(vendor);
+        User vendor = registeringVendor(createVendorRequest);
+        userRepository.save(vendor);
         SendOtpRequest OTPRequest = new SendOtpRequest();
         OTPRequest.setEmail(createVendorRequest.getEmailAddress());
         return sendOTP(OTPRequest);
 
     }
 
-    private CreateVendorResponse registeredVendorResponse(Vendor savedVendor) {
+    private CreateVendorResponse registeredVendorResponse(User savedVendor) {
         CreateVendorResponse createVendorResponse = new CreateVendorResponse();
         createVendorResponse.setId(savedVendor.getId());
         createVendorResponse.setStatusCode(201);
@@ -66,33 +67,31 @@ public class VendorServiceImpl implements VendorService {
         return createVendorResponse;
     }
 
-    private Vendor registeringVendor(CreateVendorRequest createVendorRequest) {
-        Vendor vendor = new Vendor();
-        if(vendorRepository.findByEmail(createVendorRequest.getEmailAddress()).isPresent())
+    private User registeringVendor(CreateVendorRequest createVendorRequest) {
+        User vendor = new User();
+        if(userRepository.findByEmail(createVendorRequest.getEmailAddress()).isPresent())
             throw new RuntimeException("This email has been taken, kindly register with another email address");
         else
             vendor.setEmail(createVendorRequest.getEmailAddress());
         vendor.setPassword(createVendorRequest.getPassword());
         vendor.setStoreName(createVendorRequest.getStoreName());
         vendor.setStatus(UNVERIFIED);
-//        Role role = new Role();
-//        role.setRoleName("VENDOR");
         vendor.setRole(VENDOR);
         return vendor;
     }
 
     @Override
     public String sendOTP(SendOtpRequest sendOtpRequest) {
-        Vendor savedVendor = vendorRepository.findByEmail(sendOtpRequest.getEmail())
+        User savedVendor = userRepository.findByEmail(sendOtpRequest.getEmail())
                 .orElseThrow(() -> new RuntimeException("Email not found"));
         return generateOtpToken(sendOtpRequest, savedVendor);
     }
 
-    private String generateOtpToken(SendOtpRequest sendOtpRequest, Vendor savedVendor) {
+    private String generateOtpToken(SendOtpRequest sendOtpRequest, User savedVendor) {
         String token = Token.generateToken(4);
         OTPToken otpToken = new OTPToken();
         otpToken.setToken(token);
-        otpToken.setVendor(savedVendor);
+        otpToken.setUser(savedVendor);
         otpToken.setCreatedAt(LocalDateTime.now());
         otpToken.setExpiredAt(LocalDateTime.now().plusMinutes(10));
         otpTokenRepository.save(otpToken);
@@ -104,9 +103,9 @@ public class VendorServiceImpl implements VendorService {
     @Override
     public CreateVendorResponse createAccount(String email, VerifyOtpRequest verifyOtpRequest) {
         verifyOTP(verifyOtpRequest);
-        var savedVendor = vendorRepository.findByEmail(email)
+        var savedVendor = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Vendor does not exists"));
-        vendorRepository.enableVendor(VERIFIED, savedVendor.getEmail());
+        userRepository.enableUser(VERIFIED, savedVendor.getEmail());
         return registeredVendorResponse(savedVendor);
     }
 
@@ -123,83 +122,69 @@ public class VendorServiceImpl implements VendorService {
         otpTokenRepository.setVerifiedAt(LocalDateTime.now(), verifyOtpRequest.getToken());
     }
 
-    @Override
-    public String forgotPassword(ForgotPasswordRequest forgotPasswordRequest) throws MessagingException {
-        Vendor forgotVendor = vendorRepository.findByEmail(forgotPasswordRequest.getEmail())
-                .orElseThrow(() -> new RuntimeException("This email is not registered"));
-        var genToken = Token.generateToken(4);
-        OTPToken otpToken = new OTPToken();
-        otpToken.setToken(genToken);
-        otpToken.setVendor(forgotVendor);
-        otpToken.setCreatedAt(LocalDateTime.now());
-        otpToken.setExpiredAt(LocalDateTime.now().plusMinutes(10));
-        otpTokenRepository.save(otpToken);
-        emailService.sendEmail(forgotPasswordRequest.getEmail(), forgotVendor.getStoreName(), genToken);
-        return "Token successfully sent to your email. Please check.";
-    }
+//    @Override
+//    public String forgotPassword(ForgotPasswordRequest forgotPasswordRequest) throws MessagingException {
+//        Vendor forgotVendor = vendorRepository.findByEmail(forgotPasswordRequest.getEmail())
+//                .orElseThrow(() -> new RuntimeException("This email is not registered"));
+//        var genToken = Token.generateToken(4);
+//        OTPToken otpToken = new OTPToken();
+//        otpToken.setToken(genToken);
+//        otpToken.setVendor(forgotVendor);
+//        otpToken.setCreatedAt(LocalDateTime.now());
+//        otpToken.setExpiredAt(LocalDateTime.now().plusMinutes(10));
+//        otpTokenRepository.save(otpToken);
+//        emailService.sendEmail(forgotPasswordRequest.getEmail(), forgotVendor.getStoreName(), genToken);
+//        return "Token successfully sent to your email. Please check.";
+//    }
 
-    @Override
-    public StoreResponse resetPassword(String email, ResetPasswordRequest resetPasswordRequest) {
-        OtpVerificationForResetPassword(resetPasswordRequest);
-        Vendor lostVendor = vendorRepository.findByEmail(email).get();
-        lostVendor.setPassword(resetPasswordRequest.getPassword());
-        if(BCrypt.checkpw(resetPasswordRequest.getConfirmPassword(), resetPasswordRequest.getPassword())) {
-            vendorRepository.save(lostVendor);
-            return new StoreResponse("Your password has been reset successfully");
-        } else {
-            throw new IllegalStateException("Password does not match");
-        }
-    }
+//    @Override
+//    public StoreResponse resetPassword(String email, ResetPasswordRequest resetPasswordRequest) {
+//        OtpVerificationForResetPassword(resetPasswordRequest);
+//        User lostVendor = userRepository.findByEmail(email).get();
+//        lostVendor.setPassword(resetPasswordRequest.getPassword());
+//        if(BCrypt.checkpw(resetPasswordRequest.getConfirmPassword(), resetPasswordRequest.getPassword())) {
+//            vendorRepository.save(lostVendor);
+//            return new StoreResponse("Your password has been reset successfully");
+//        } else {
+//            throw new IllegalStateException("Password does not match");
+//        }
+//    }
 
-    private void OtpVerificationForResetPassword(ResetPasswordRequest resetPasswordRequest) {
-        var foundToken = otpTokenRepository.findByToken(resetPasswordRequest.getToken())
-                .orElseThrow(() -> new RuntimeException("Token doesn't exist"));
-        if(foundToken.getVerifiedAt() != null)
-            throw new RuntimeException("Token has been used");
-        if(!Objects.equals(resetPasswordRequest.getToken(), foundToken.getToken()))
-            throw new RuntimeException("Incorrect token");
-        if(foundToken.getExpiredAt().isBefore(LocalDateTime.now()))
-            throw new RuntimeException("Token has expired");
-        otpTokenRepository.setVerifiedAt(LocalDateTime.now(), resetPasswordRequest.getToken());
-    }
+//    private void OtpVerificationForResetPassword(ResetPasswordRequest resetPasswordRequest) {
+//        var foundToken = otpTokenRepository.findByToken(resetPasswordRequest.getToken())
+//                .orElseThrow(() -> new RuntimeException("Token doesn't exist"));
+//        if(foundToken.getVerifiedAt() != null)
+//            throw new RuntimeException("Token has been used");
+//        if(!Objects.equals(resetPasswordRequest.getToken(), foundToken.getToken()))
+//            throw new RuntimeException("Incorrect token");
+//        if(foundToken.getExpiredAt().isBefore(LocalDateTime.now()))
+//            throw new RuntimeException("Token has expired");
+//        otpTokenRepository.setVerifiedAt(LocalDateTime.now(), resetPasswordRequest.getToken());
+//    }
 
     @Override
     public LoginResponse login(LoginRequest loginRequest) {
-        Vendor loggingIn = vendorRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new RuntimeException("Incorrect Email"));
-        if(loggingIn.getStatus() != VERIFIED) throw new RuntimeException("Vendor is not verified");
-        LoginResponse res = new LoginResponse();
-        if(BCrypt.checkpw(loginRequest.getPassword(), loggingIn.getPassword())) {
-            res.setMessage("login is successful");
-            return res;
-        }
-        res.setMessage("failed to login");
-        return res;
+        return userService.login(loginRequest);
     }
 
     @Override
     public StoreResponse changePassword(String email, ChangePasswordRequest changePasswordRequest) {
-        Vendor verifiedVendor = vendorRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Vendor isn't registered"));
-        if(BCrypt.checkpw(changePasswordRequest.getOldPassword(), verifiedVendor.getPassword()))
-            verifiedVendor.setPassword(changePasswordRequest.getNewPassword());
-        vendorRepository.save(verifiedVendor);
-        return new StoreResponse("Your password has been successfully changed");
+        return userService.changePassword(email, changePasswordRequest);
     }
 
     @Override
     public StoreResponse updateVendor(Integer id, UpdateVendorRequest updateVendorRequest) {
-        var findVendor = vendorRepository.findById(id);
+        var findVendor = userRepository.findById(id);
                 if(findVendor.isEmpty()) throw new RuntimeException("Vendor not found");
-        Vendor foundVendor = updatingVendor(updateVendorRequest, findVendor);
+        User foundVendor = updatingVendor(updateVendorRequest, findVendor);
         updatingVendor2(updateVendorRequest, foundVendor);
-        vendorRepository.save(foundVendor);
+        userRepository.save(foundVendor);
         return new StoreResponse("Vendor has been updated");
     }
 
-    private Vendor updatingVendor(UpdateVendorRequest updateVendorRequest, Optional<Vendor> findVendor) {
+    private User updatingVendor(UpdateVendorRequest updateVendorRequest, Optional<User> findVendor) {
         var foundVendor = findVendor.get();
-        if(vendorRepository.findByPhoneNumber(updateVendorRequest.getPhone()).isPresent())
+        if(userRepository.findByPhoneNumber(updateVendorRequest.getPhone()).isPresent())
             throw new RuntimeException("This Phone Number has been taken, kindly provide with another");
         else
             foundVendor.setPhoneNumber(updateVendorRequest.getPhone()!= null && !updateVendorRequest.getPhone()
@@ -210,7 +195,7 @@ public class VendorServiceImpl implements VendorService {
     }
 
 
-    private void updatingVendor2(UpdateVendorRequest updateVendorRequest, Vendor foundVendor) {
+    private void updatingVendor2(UpdateVendorRequest updateVendorRequest, User foundVendor) {
         foundVendor.setEmail(updateVendorRequest.getEmail() != null && !updateVendorRequest.getEmail()
                 .equals("") ? updateVendorRequest.getEmail() : foundVendor.getEmail());
         Set<String> vendorStoreAddress = foundVendor.getStoreAddress();
@@ -220,13 +205,13 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     public StoreResponse deleteVendor(Integer id, DeleteRequest deleteRequest) {
-        Vendor foundVendor = vendorRepository.findById(id).orElseThrow(
+        User foundVendor = userRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Vendor doesn't exist"));
 //        String deleteToken = UUID.randomUUID().toString();
         if(BCrypt.checkpw(deleteRequest.getPassword(), foundVendor.getPassword())) {
             String deleteVendor = "Deleted" + " + " + foundVendor.getEmail();
             foundVendor.setEmail(deleteVendor);
-            vendorRepository.save(foundVendor);
+            userRepository.save(foundVendor);
             return new StoreResponse("Vendor deleted");
         } else {
             throw new RuntimeException("Vendor can't be deleted");
@@ -234,15 +219,15 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
-    public StoreResponse addProduct(int id, AddProductRequest addProductRequest) {
-        Vendor savedVendor = vendorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Vendor not found"));
+    public StoreResponse addProduct(AddProductRequest addProductRequest) {
+//        User savedVendor = userRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("Vendor not found"));
         Product product = new Product();
         product.setProductName(addProductRequest.getProductName());
         product.setQuantity(addProductRequest.getProductQuantity());
         product.setUnitPrice(addProductRequest.getPrice());
-        product.setCategory(ProductCategory.GROCERIES);
-        savedVendor.getProductList().add(product);
+        product.setCategory(ProductCategory.valueOf(addProductRequest.getCategory().toUpperCase()));
+//        savedVendor.getProductList().add(product);
         productRepository.save(product);
 //        productService.createProduct(addProductRequest);
 

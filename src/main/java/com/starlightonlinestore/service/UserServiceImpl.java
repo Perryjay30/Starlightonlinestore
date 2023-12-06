@@ -1,5 +1,6 @@
 package com.starlightonlinestore.service;
 
+import com.starlightonlinestore.config.JwtService;
 import com.starlightonlinestore.data.exceptions.CustomerRegistrationException;
 import com.starlightonlinestore.data.exceptions.StoreException;
 import com.starlightonlinestore.data.models.*;
@@ -10,11 +11,14 @@ import com.starlightonlinestore.data.repository.OtpTokenRepository;
 import com.starlightonlinestore.utils.validators.EmailService;
 import com.starlightonlinestore.utils.validators.Token;
 import com.starlightonlinestore.utils.validators.UserDetailsValidator;
-import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -32,13 +36,15 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final OtpTokenRepository otpTokenRepository;
     private final EmailService emailService;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
     @Override
     public String register(CustomerRegistrationRequest registrationRequest) {
         if(!UserDetailsValidator.isValidEmailAddress(registrationRequest.getEmail()))
             throw new CustomerRegistrationException(String.
                     format("email %s is invalid", registrationRequest.getEmail()));
-        User user = buildBuyer(registrationRequest);
+        User user = OnboardUser(registrationRequest);
         userRepository.save(user);
         SendOtpRequest OTPRequest = new SendOtpRequest();
         OTPRequest.setEmail(registrationRequest.getEmail());
@@ -56,6 +62,34 @@ public class UserServiceImpl implements UserService {
 //        customerRepository.save(savedCustomer);
         userRepository.enableUser(VERIFIED, savedCustomer.getEmail());
         return buildBuyerRegistrationResponse(savedCustomer);
+    }
+
+    @Override
+    public LoginResponse login(LoginRequest loginRequest) {
+        User foundUser = getFoundCustomer(userRepository.findByEmail(loginRequest
+                .getEmail()), "your email is incorrect");
+        if(foundUser.getStatus() != VERIFIED) throw new RuntimeException("Customer is not verified");
+        Authentication authenticating = authenticationManager.authenticate
+                (new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+        String loginMessage, token;
+        if(authenticating.isAuthenticated()) {
+            token = jwtService.generateToken(loginRequest.getEmail());
+            loginMessage = "Login Successful!!";
+            return new LoginResponse(loginMessage, token);
+        } else
+            throw new UsernameNotFoundException("Invalid credentials!!");
+//        User foundUser = getFoundCustomer(userRepository.findByEmail(loginRequest
+//                .getEmail()), "your email is incorrect");
+//        if(foundUser.getStatus() != VERIFIED) throw new RuntimeException("Customer is not verified");
+////      foundCustomer.setEmail(loginRequest.getEmail())
+//        LoginResponse loginResponse = new LoginResponse();
+////        if(foundCustomer.getPassword().equals(loginRequest.getPassword())) {
+//        if(BCrypt.checkpw(loginRequest.getPassword(), foundUser.getPassword())) {
+//            loginResponse.setMessage("successful login");
+//            return loginResponse;
+//        }
+//        loginResponse.setMessage("authentication failed");
+//        return loginResponse;
     }
 
     @Override
@@ -129,7 +163,7 @@ public class UserServiceImpl implements UserService {
         return response;
     }
 
-    private User buildBuyer(CustomerRegistrationRequest registrationRequest) {
+    private User OnboardUser (CustomerRegistrationRequest registrationRequest) {
         User user = new User();
         user.setFirstName(registrationRequest.getFirstName());
         user.setLastName(registrationRequest.getLastName());
@@ -139,26 +173,8 @@ public class UserServiceImpl implements UserService {
             user.setEmail(registrationRequest.getEmail());
         user.setPassword(registrationRequest.getPassword());
         user.setStatus(UNVERIFIED);
-//        Role role = new Role();
-//        role.setRoleName("USER");
         user.setRole(USER);
         return user;
-    }
-
-    @Override
-    public LoginResponse login(LoginRequest loginRequest) {
-        User foundUser = getFoundCustomer(userRepository.findByEmail(loginRequest
-                .getEmail()), "your email is incorrect");
-        if(foundUser.getStatus() != VERIFIED) throw new RuntimeException("Customer is not verified");
-//      foundCustomer.setEmail(loginRequest.getEmail())
-        LoginResponse loginResponse = new LoginResponse();
-//        if(foundCustomer.getPassword().equals(loginRequest.getPassword())) {
-        if(BCrypt.checkpw(loginRequest.getPassword(), foundUser.getPassword())) {
-            loginResponse.setMessage("successful login");
-            return loginResponse;
-        }
-        loginResponse.setMessage("authentication failed");
-        return loginResponse;
     }
 
     @Override
@@ -206,11 +222,11 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new StoreException("User isn't available"));
 //        Role role = new Role();
 //        role.setRoleName(assignRoleRequest.getUserRole());
-        if(existingUser.getRole().equals(USER)) existingUser.setRole(Role.valueOf(assignRoleRequest.getUserRole().toUpperCase()));
-        else throw new StoreException("User role already exists");
+        existingUser.setRole(Role.valueOf(assignRoleRequest.getUserRole().toUpperCase()));
         userRepository.save(existingUser);
 //        emailService.emailForAssignRole(existingUser.getEmail(), existingUser.getFirstName());
-        return new StoreResponse(existingUser.getFirstName() + " is now an admin");
+        return new StoreResponse(existingUser.getFirstName() + " is now a  " +
+                " " + existingUser.getRole());
     }
 
     private User updatingTheCustomer(EditCustomerProfileRequest editCustomerProfileRequest, Optional<User> customer) {
