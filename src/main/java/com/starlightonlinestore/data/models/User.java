@@ -22,6 +22,7 @@ public class User {
     private String email;
     private String password;
     private String phoneNumber;
+    private String storeName;
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -31,4 +32,8 @@ public class User {
     private List<CustomerOrder> customerOrderList = new ArrayList<>();
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Cart> customerCart = new ArrayList<>();
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<String> storeAddress = new HashSet<>();
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<Product> productList = new ArrayList<>();
 }

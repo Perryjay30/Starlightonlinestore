@@ -22,9 +22,9 @@ public class OTPToken {
     @JoinColumn(name="customer_id", referencedColumnName="id")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name="vendor_id", referencedColumnName="id")
-    private Vendor vendor;
+//    @ManyToOne
+//    @JoinColumn(name="vendor_id", referencedColumnName="id")
+//    private Vendor vendor;
 
     public OTPToken(String token, LocalDateTime createdAt, LocalDateTime expiredAt, User user) {
         this.token = token;
