@@ -21,4 +21,11 @@ public class FetchUserDetailsFromDbService implements UserDetailsService {
        Optional<User> existingUser = userRepository.findByEmail(email);
        return existingUser.map(FetchUserDetailsFromDb::new).orElseThrow(() -> new RuntimeException("User not found"));
     }
+
+//    Optional<Vendor> existingVendor = vendorRepository.findByEmail(email);
+//       if(existingUser.isPresent())
+//               return existingUser.map(FetchUserDetailsFromDb::new).orElseThrow(() -> new RuntimeException("User not found"));
+//       else if (existingVendor.isPresent()) {
+//        return existingVendor.map(FetchUserDetailsFromDb::new).orElseThrow(() -> new RuntimeException("User not found"));
+//    }
 }
