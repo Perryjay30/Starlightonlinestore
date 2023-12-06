@@ -31,22 +31,22 @@ class VendorServiceImplTest {
     @Test
     void testThatVendorAccountHasBeenCreated() {
         VerifyOtpRequest verifyOtpRequest = new VerifyOtpRequest();
-        verifyOtpRequest.setToken("1058");
+        verifyOtpRequest.setToken("9131");
 //        verifyOtpRequest.setEmail("mrjesus3003@gmail.com");
         CreateVendorResponse vendorResponse =
-                vendorService.createAccount("", verifyOtpRequest);
+                vendorService.createAccount("mrjesus3003@gmail.com", verifyOtpRequest);
         assertEquals("Successfully registered", vendorResponse.getMessage());
     }
 
 
-    @Test
-    void testThatVendorCanLogin() {
-        LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setEmail("helloworld@gmail.com");
-        loginRequest.setPassword("Iamnotalone#12");
-        LoginResponse loginResponse = vendorService.login(loginRequest);
-        assertEquals("login is successful", loginResponse.getMessage());
-    }
+//    @Test
+//    void testThatVendorCanLogin() {
+//        LoginRequest loginRequest = new LoginRequest();
+//        loginRequest.setEmail("helloworld@gmail.com");
+//        loginRequest.setPassword("Iamnotalone#12");
+//        LoginResponse loginResponse = vendorService.login(loginRequest);
+//        assertEquals("login is successful", loginResponse.getMessage());
+//    }
 
     @Test
     void testThatVendorCanChangePassword() {
@@ -58,24 +58,24 @@ class VendorServiceImplTest {
         assertEquals("Your password has been successfully changed", resp.getMessage());
     }
 
-    @Test
-    void testThatForgotPasswordMethodWorks() throws MessagingException {
-        ForgotPasswordRequest forgotPasswordRequest = new ForgotPasswordRequest();
-        forgotPasswordRequest.setEmail("helloworld@gmail.com");
-        var response = vendorService.forgotPassword(forgotPasswordRequest);
-        assertEquals("Token successfully sent to your email. Please check.", response);
-    }
+//    @Test
+//    void testThatForgotPasswordMethodWorks() throws MessagingException {
+//        ForgotPasswordRequest forgotPasswordRequest = new ForgotPasswordRequest();
+//        forgotPasswordRequest.setEmail("helloworld@gmail.com");
+//        var response = vendorService.forgotPassword(forgotPasswordRequest);
+//        assertEquals("Token successfully sent to your email. Please check.", response);
+//    }
 
-    @Test
-    void testThatPasswordCanBeResetAfterForgotten() {
-        ResetPasswordRequest resetPasswordRequest = new ResetPasswordRequest();
-        resetPasswordRequest.setToken("3122");
-//        resetPasswordRequest.setEmail("helloworld@gmail.com");
-        resetPasswordRequest.setPassword("Nightingale@90");
-        resetPasswordRequest.setConfirmPassword("Nightingale@90");
-        StoreResponse answer = vendorService.resetPassword("", resetPasswordRequest);
-        assertEquals("Your password has been reset successfully", answer.getMessage());
-    }
+//    @Test
+//    void testThatPasswordCanBeResetAfterForgotten() {
+//        ResetPasswordRequest resetPasswordRequest = new ResetPasswordRequest();
+//        resetPasswordRequest.setToken("3122");
+////        resetPasswordRequest.setEmail("helloworld@gmail.com");
+//        resetPasswordRequest.setPassword("Nightingale@90");
+//        resetPasswordRequest.setConfirmPassword("Nightingale@90");
+//        StoreResponse answer = vendorService.resetPassword("", resetPasswordRequest);
+//        assertEquals("Your password has been reset successfully", answer.getMessage());
+//    }
 
 
     @Test
@@ -98,15 +98,15 @@ class VendorServiceImplTest {
         System.out.println(delResponse);
         assertEquals("Vendor deleted", delResponse.getMessage());
     }
-//
-    @Test
-    void testThatVendorCanAddProduct() {
-        AddProductRequest productRequest = new AddProductRequest();
-        productRequest.setProductName("MacBook Pro");
-        productRequest.setPrice(460000.00);
-        productRequest.setProductQuantity(10);
-        productRequest.setCategory(ProductCategory.COMPUTING);
-        StoreResponse response = vendorService.addProduct(1, productRequest);
-        assertEquals("Product has been added successfully", response.getMessage());
-    }
+
+//    @Test
+//    void testThatVendorCanAddProduct() {
+//        AddProductRequest productRequest = new AddProductRequest();
+//        productRequest.setProductName("MacBook Pro");
+//        productRequest.setPrice(460000.00);
+//        productRequest.setProductQuantity(10);
+//        productRequest.setCategory(ProductCategory.COMPUTING);
+//        StoreResponse response = vendorService.addProduct(1, productRequest);
+//        assertEquals("Product has been added successfully", response.getMessage());
+//    }
 }

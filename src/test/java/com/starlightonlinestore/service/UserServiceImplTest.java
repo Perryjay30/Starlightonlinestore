@@ -2,13 +2,10 @@ package com.starlightonlinestore.service;
 
 import com.starlightonlinestore.data.dto.Request.*;
 import com.starlightonlinestore.data.dto.Response.*;
-import com.starlightonlinestore.data.models.Role;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import static com.starlightonlinestore.data.models.Role.ADMIN;
 import static com.starlightonlinestore.data.models.Role.USER;
 import static org.junit.jupiter.api.Assertions.*;
 

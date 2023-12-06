@@ -2,29 +2,28 @@ server:
   port: 8082
 spring:
   datasource:
-    url: ${DATABASE_URL}
+    url: jdbc:mysql://localhost:3306/Starlightonlinestore_db?createDatabaseIfNotExist=true
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${USERNAME}
-    password: ${PASSWORD}
+    username: root
+    password: Oluwapelumi
 
   jpa:
     hibernate:
       ddl-auto: update
-
     database-platform: org.hibernate.dialect.MySQL8Dialect
 
 
   mail:
-    host: ${MAIL_HOST}
-    port: ${MAIL_PORT}
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
+    host: smtp.gmail.com
+    port: 465
+    username: pelumijsh@gmail.com
+    password: frkeirjbsowzzzbu
 
     properties:
       mail:
         smtp:
-#          ssl:
-#            trust: "*"
+          #          ssl:
+          #            trust: "*"
           auth: true
           starttls:
             enable: true
@@ -33,6 +32,45 @@ spring:
           writetimeout: 5000
           ssl:
             enable: true
+
+
+
+
+#server:
+#  port: 8082
+#spring:
+#  datasource:
+#    url: ${DATABASE_URL}
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    username: ${USERNAME}
+#    password: ${PASSWORD}
+#
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#
+#    database-platform: org.hibernate.dialect.MySQL8Dialect
+#
+#
+#  mail:
+#    host: ${MAIL_HOST}
+#    port: ${MAIL_PORT}
+#    username: ${MAIL_USERNAME}
+#    password: ${MAIL_PASSWORD}
+#
+#    properties:
+#      mail:
+#        smtp:
+##          ssl:
+##            trust: "*"
+#          auth: true
+#          starttls:
+#            enable: true
+#          connectiontimeout: 5000
+#          timeout: 3000
+#          writetimeout: 5000
+#          ssl:
+#            enable: true
 
 
 #spring.mail.host=${MAIL_HOST}
