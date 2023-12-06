@@ -12,7 +12,7 @@ public class AddProductRequest {
     @NotNull(message = "This field is required")
     private Double price;
     @NotNull(message = "This field is required")
-    private ProductCategory category;
+    private String category;
     @NotNull(message = "This field is required")
     private int productQuantity;
 }
