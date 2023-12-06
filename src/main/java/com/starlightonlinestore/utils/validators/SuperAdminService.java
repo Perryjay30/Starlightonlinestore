@@ -5,6 +5,7 @@ import com.starlightonlinestore.data.models.User;
 import com.starlightonlinestore.data.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -23,10 +24,10 @@ public class SuperAdminService {
     public void createSuperAdmin() {
         try {
             if (userRepository.findByRole(SUPER_ADMIN).isEmpty()) {
-//            Role role = new Role();
-//            role.setRoleName("SUPER_ADMIN");
                 User superAdmin = User.builder()
-                        .email("pelumijsh@gmail.com").password("KingPerry@29").lastName("Taiwo")
+                        .email("pelumijsh@gmail.com")
+                        .password(BCrypt.hashpw("KingPerry@29", BCrypt.gensalt()))
+                        .lastName("Taiwo")
                         .firstName("Oluwapelumi").status(VERIFIED).role(SUPER_ADMIN).build();
                 userRepository.save(superAdmin);
             }

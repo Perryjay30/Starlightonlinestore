@@ -2,7 +2,7 @@ package com.starlightonlinestore.utils.validators;
 
 public class UserDetailsValidator {
     public static boolean isValidPassword(String password) {
-        return password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,20}$");
+        return password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$");
     }
 
     public static boolean isValidPhoneNumber(String phoneNumber) {

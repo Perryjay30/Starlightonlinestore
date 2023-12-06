@@ -17,7 +17,6 @@ public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender javaMailSender;
 
-    @Autowired
     public EmailServiceImpl(JavaMailSender javaMailSender) {
         this.javaMailSender = javaMailSender;
     }
