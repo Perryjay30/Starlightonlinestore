@@ -1,11 +1,10 @@
 package com.starlightonlinestore.config.oauth2.successhandlers;
 
-import com.example.oauth2sociallogin.exceptions.OAuth2SocialLoginException;
-import com.example.oauth2sociallogin.security.oauth2.CustomOauth2User;
-import com.example.oauth2sociallogin.user.data.model.AuthProvider;
-import com.example.oauth2sociallogin.user.data.model.User;
-import com.example.oauth2sociallogin.user.repository.UserRepository;
 import com.starlightonlinestore.config.oauth2.CustomOauth2User;
+import com.starlightonlinestore.data.exceptions.OAuth2SocialLoginException;
+import com.starlightonlinestore.data.models.AuthProvider;
+import com.starlightonlinestore.data.models.User;
+import com.starlightonlinestore.data.repository.UserRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,28 +27,28 @@ public class FacebookOAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSu
         CustomOauth2User oauth2User = (CustomOauth2User)authentication.getPrincipal();
         String emailAddress = oauth2User.getEmail();
         String firstName = oauth2User.getName();
-        Optional<User> user = userRepository.findByEmailAddress(emailAddress);
+        Optional<User> user = userRepository.findByEmail(emailAddress);
         if (user.isEmpty()) {
-            createNewUserAfterGithubOAuthLoginSuccess(emailAddress, firstName);
+            createNewUserAfterFacebookOAuthLoginSuccess(emailAddress, firstName);
         } else {
-            updateUserAfterGithubOAuthLoginSuccess(emailAddress, firstName);
+            updateUserAfterFacebookOAuthLoginSuccess(emailAddress, firstName);
         }
 
         System.out.println("User's emailAddress: " + emailAddress);
         super.onAuthenticationSuccess(request, response, authentication);
     }
 
-    private void updateUserAfterGithubOAuthLoginSuccess(String emailAddress, String firstName) {
-        User existingUser = userRepository.findByEmailAddress(emailAddress).orElseThrow(() ->
+    private void updateUserAfterFacebookOAuthLoginSuccess(String emailAddress, String firstName) {
+        User existingUser = userRepository.findByEmail(emailAddress).orElseThrow(() ->
                 new OAuth2SocialLoginException("User not found!!"));
         existingUser.setAuthProvider(AuthProvider.FACEBOOK);
         existingUser.setFirstName(firstName);
         userRepository.save(existingUser);
     }
 
-    private void createNewUserAfterGithubOAuthLoginSuccess(String emailAddress, String firstName) {
+    private void createNewUserAfterFacebookOAuthLoginSuccess(String emailAddress, String firstName) {
         User user = new User();
-        user.setEmailAddress(emailAddress);
+        user.setEmail(emailAddress);
         user.setAuthProvider(AuthProvider.FACEBOOK);
         user.setFirstName(firstName);
         userRepository.save(user);

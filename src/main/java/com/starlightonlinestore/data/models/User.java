@@ -25,6 +25,8 @@ public class User {
     private String storeName;
     @Enumerated(EnumType.STRING)
     private Role role;
+    @Enumerated(EnumType.STRING)
+    private AuthProvider authProvider;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> deliveryAddress = new HashSet<>();

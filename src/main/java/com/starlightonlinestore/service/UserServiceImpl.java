@@ -162,6 +162,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(registrationRequest.getPassword());
         user.setStatus(UNVERIFIED);
         user.setRole(USER);
+        user.setAuthProvider(AuthProvider.LOCAL);
         return user;
     }
 
