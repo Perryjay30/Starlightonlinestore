@@ -78,18 +78,6 @@ public class UserServiceImpl implements UserService {
             return new LoginResponse(loginMessage, token);
         } else
             throw new UsernameNotFoundException("Invalid credentials!!");
-//        User foundUser = getFoundCustomer(userRepository.findByEmail(loginRequest
-//                .getEmail()), "your email is incorrect");
-//        if(foundUser.getStatus() != VERIFIED) throw new RuntimeException("Customer is not verified");
-////      foundCustomer.setEmail(loginRequest.getEmail())
-//        LoginResponse loginResponse = new LoginResponse();
-////        if(foundCustomer.getPassword().equals(loginRequest.getPassword())) {
-//        if(BCrypt.checkpw(loginRequest.getPassword(), foundUser.getPassword())) {
-//            loginResponse.setMessage("successful login");
-//            return loginResponse;
-//        }
-//        loginResponse.setMessage("authentication failed");
-//        return loginResponse;
     }
 
     @Override
@@ -247,5 +235,10 @@ public class UserServiceImpl implements UserService {
         foundUser.setEmail(editCustomerProfileRequest.getEmail() != null && !editCustomerProfileRequest.getEmail()
                 .equals("") ? editCustomerProfileRequest.getEmail() : foundUser.getEmail());
         return foundUser;
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 }

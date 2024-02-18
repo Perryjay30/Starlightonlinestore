@@ -5,6 +5,7 @@ import com.starlightonlinestore.data.dto.Response.*;
 import com.starlightonlinestore.data.models.User;
 import jakarta.mail.MessagingException;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -31,4 +32,5 @@ public interface UserService {
     StoreResponse updateCustomer(Integer id, EditCustomerProfileRequest editCustomerProfileRequest);
     StoreResponse assignRoles(AssignRoleRequest assignRoleRequest) throws MessagingException;
     User getFoundCustomer(Optional<User> customerRepository, String message);
+    List<User> getAllUsers();
 }
