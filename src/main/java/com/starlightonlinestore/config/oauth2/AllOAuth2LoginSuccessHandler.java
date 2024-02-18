@@ -1,9 +1,9 @@
 package com.starlightonlinestore.config.oauth2;
 
-import com.example.oauth2sociallogin.user.repository.UserRepository;
 import com.starlightonlinestore.config.oauth2.successhandlers.FacebookOAuth2LoginSuccessHandler;
 import com.starlightonlinestore.config.oauth2.successhandlers.GithubOAuth2LoginSuccessHandler;
 import com.starlightonlinestore.config.oauth2.successhandlers.GoogleOAuth2LoginSuccessHandler;
+import com.starlightonlinestore.data.repository.UserRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
