@@ -1,4 +1,4 @@
-package com.starlightonlinestore.config.dto;
+package com.starlightonlinestore.data.dto.Request;
 
 import lombok.Data;
 
