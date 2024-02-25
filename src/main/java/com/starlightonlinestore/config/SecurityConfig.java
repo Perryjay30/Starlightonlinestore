@@ -6,7 +6,6 @@ import com.starlightonlinestore.config.oauth2.successhandlers.FacebookOAuth2Logi
 import com.starlightonlinestore.config.oauth2.successhandlers.GithubOAuth2LoginSuccessHandler;
 import com.starlightonlinestore.config.oauth2.successhandlers.GoogleOAuth2LoginSuccessHandler;
 import com.starlightonlinestore.data.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

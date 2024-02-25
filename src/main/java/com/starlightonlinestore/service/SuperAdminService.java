@@ -1,6 +1,7 @@
-package com.starlightonlinestore.utils.validators;
+package com.starlightonlinestore.service;
 
 import com.starlightonlinestore.data.exceptions.StoreException;
+import com.starlightonlinestore.data.models.AuthProvider;
 import com.starlightonlinestore.data.models.User;
 import com.starlightonlinestore.data.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
@@ -28,6 +29,7 @@ public class SuperAdminService {
                         .email("pelumijsh@gmail.com")
                         .password(BCrypt.hashpw("KingPerry@29", BCrypt.gensalt()))
                         .lastName("Taiwo")
+                        .authProvider(AuthProvider.LOCAL)
                         .firstName("Oluwapelumi").status(VERIFIED).role(SUPER_ADMIN).build();
                 userRepository.save(superAdmin);
             }
