@@ -38,7 +38,7 @@ public class UserController {
 
     @GetMapping("/login")
     //Social login links:
-    //Facebook: http://localhost:8082/login/oauth2/code/google
+    //Google: http://localhost:8082/login/oauth2/code/google
     //Github: http://localhost:8082/login/oauth2/code/github
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         return ResponseEntity.ok(userService.login(loginRequest));
